@@ -12,12 +12,12 @@ object PixelTransform {
   }
 
   def inRange(min:Int, max:Int, value:Int) = {
-    if (value >= max) {
-      value - max
-    } else if (value < min) {
-      value + max
+    val range = (max + 1) - min
+    val wrapped = (value - min) % range
+    if (wrapped < 0) {
+      (wrapped + max) + 1
     } else {
-      value
+      wrapped + min
     }
   }
 
