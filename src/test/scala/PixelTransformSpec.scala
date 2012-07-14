@@ -38,4 +38,17 @@ class PixelTransformSpec extends Specification {
       PixelTransform.inRange(-15, -7, -34) must_== -7
     }
   }
+
+  "The 'PixelTransform' object 'shift' method" should {
+    "be a function (Int => Int)" in {
+      todo
+    }
+    "be a function that returns an Int" in {
+      val shift = PixelTransform.shift(10, 10, 5, 5)
+      shift(0, 0) must_== (5, 5)
+      shift(6, 6) must_== (0, 0)
+      shift(11, 11) must_== (5, 5)
+    }
+  }
+
 }
