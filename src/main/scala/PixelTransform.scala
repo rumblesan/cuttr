@@ -2,11 +2,18 @@ package com.rumblesan.scala_images
 
 object PixelTransform {
 
+  def funcVar(width:Int, height:Int, xFunc:(Int => Int), yFunc:(Int => Int)) = {
+    (x:Int, y:Int) => {
+      (inRange(0, width,  xFunc(x)),
+       inRange(0, height, yFunc(y)))
+    }
+  }
+
   def shift(width:Int, height:Int, xShift:Int, yShift:Int) = {
 
     (x:Int, y:Int) => {
       (inRange(0, width,  x + xShift),
-        inRange(0, height, y + yShift))
+       inRange(0, height, y + yShift))
     }
 
   }

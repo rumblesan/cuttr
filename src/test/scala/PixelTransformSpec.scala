@@ -43,11 +43,24 @@ class PixelTransformSpec extends Specification {
     "be a function (Int => Int)" in {
       todo
     }
-    "be a function that returns an Int" in {
+    "be a function that returns a Tuple of two Ints" in {
       val shift = PixelTransform.shift(10, 10, 5, 5)
       shift(0, 0) must_== (5, 5)
       shift(6, 6) must_== (0, 0)
       shift(11, 11) must_== (5, 5)
+    }
+  }
+
+  "The 'PixelTransform' object 'funcVar' method" should {
+    "be a function (Int => Int)" in {
+      todo
+    }
+    "be a function that returns a Tuple of two Ints" in {
+      val f = (i:Int) => i
+      val shift = PixelTransform.funcVar(10, 10, f, f)
+      shift(0, 0) must_== (0, 0)
+      shift(6, 6) must_== (6, 6)
+      shift(11, 11) must_== (0, 0)
     }
   }
 
