@@ -30,17 +30,19 @@ object Cuttr {
     val (width, height) = image.getSize()
     val shifter = PixelTransform.shift(width/7, height/4, 56, 3)
 
+    val output = new NewPixelImage(width, height, image.getType())
+
     for (x <- 0 until width) {
       for (y <- 0 until height) {
         val c = image.getPixel(x, y)
         val (newx, newy) = shifter(x, y)
         val prevc = image.getPixel(newx, newy)
-        image.setPixel(newx, newy, new Color(0, c.getGreen(), prevc.getBlue()))
+        output.setPixel(newx, newy, new Color(0, c.getGreen(), prevc.getBlue()))
       }
     }
 
     print("Writing")
-    ImageIO.write(image, "jpg", new File("output.jpeg"))
+    ImageIO.write(output, "jpg", new File("output.jpeg"))
 
   }
 }
