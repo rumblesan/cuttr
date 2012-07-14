@@ -28,16 +28,22 @@ object Cuttr {
     val rand = new Random(timestamp)
 
     val (width, height) = image.getSize()
-    val shifter = PixelTransform.shift(width/7, height/4, 56, 3)
+    val shifter = PixelTransform.shift(width-1, height-1, 5, 3)
 
     val output = new NewPixelImage(width, height, image.getType())
 
     for (x <- 0 until width) {
       for (y <- 0 until height) {
-        val c = image.getPixel(x, y)
-        val (newx, newy) = shifter(x, y)
-        val prevc = image.getPixel(newx, newy)
-        output.setPixel(newx, newy, new Color(0, c.getGreen(), prevc.getBlue()))
+
+        val originalColor = image.getPixel(x, y)
+
+        val (redX, redY) = shifter(x, y)
+        val (greenX, greenY) = shifter(redX, redY)
+
+        val prevRed = image.getPixel(redX, redY)
+        val prevGreen = image.getPixel(greenX, greenY)
+
+        output.setPixel(x, y, new Color(prevRed.getRed(), prevGreen.getGreen(), originalColor.getBlue()))
       }
     }
 
