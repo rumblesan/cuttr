@@ -7,10 +7,10 @@ import java.io.File
 import java.io.IOException;
 import scala.util.Random
 import java.util.Date
+import math._
 
 object Cuttr {
   def main(args: Array[String]) {
-
 
     val input = try {
       Some(ImageIO.read(new File("landscape.jpeg")))
@@ -26,9 +26,15 @@ object Cuttr {
 
     val timestamp = new Date().getTime()
     val rand = new Random(timestamp)
+    val randXShift = rand.nextDouble() * 100
+    val randYShift = rand.nextDouble() * 100
 
     val (width, height) = image.getSize()
-    val shifter = PixelTransform.shift(width-1, height-1, 5, 3)
+
+    val shiftXFunc = (pos:Int) => { round(randXShift + pos + (10 * cos(pos))).toInt}
+    val shiftYFunc = (pos:Int) => { round(randYShift + pos + (10 * cos(pos))).toInt}
+
+    val shifter = PixelTransform.funcVar(width-1, height-1, shiftXFunc, shiftYFunc)
 
     val output = new NewPixelImage(width, height, image.getType())
 
