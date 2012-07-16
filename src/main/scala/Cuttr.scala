@@ -9,6 +9,8 @@ import scala.util.Random
 import java.util.Date
 import math._
 
+import RichBufferedImage._
+
 object Cuttr {
   def main(args: Array[String]) {
 
@@ -20,9 +22,7 @@ object Cuttr {
       }
     }
 
-    val loadedImage = input.get
-
-    val image = new PixelImage(loadedImage)
+    val image = input.get
 
     val timestamp = new Date().getTime()
     val rand = new Random(timestamp)
@@ -36,7 +36,7 @@ object Cuttr {
 
     val shifter = PixelTransform.funcVar(width-1, height-1, shiftXFunc, shiftYFunc)
 
-    val output = new NewPixelImage(width, height, image.getType())
+    val output = new BufferedImage(width, height, image.getType())
 
     for (x <- 0 until width) {
       for (y <- 0 until height) {
