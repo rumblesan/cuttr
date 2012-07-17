@@ -10,6 +10,7 @@ import java.util.Date
 import math._
 
 import RichBufferedImage._
+import RichColor._
 
 object Cuttr {
   def main(args: Array[String]) {
@@ -46,8 +47,8 @@ object Cuttr {
         val (redX, redY) = shifter(x, y)
         val (greenX, greenY) = shifter(redX, redY)
 
-        val prevRed = image.getPixel(redX, redY)
-        val prevGreen = image.getPixel(greenX, greenY)
+        val prevRed = image.getPixel(redX, redY).scale(0.5)
+        val prevGreen = image.getPixel(greenX, greenY).scale(0)
 
         output.setPixel(x, y, new Color(prevRed.getRed(), prevGreen.getGreen(), originalColor.getBlue()))
       }
