@@ -1,4 +1,4 @@
-package com.rumblesan.scala_images
+package com.rumblesan.cuttr
 
 import java.awt.image.{BufferedImage, ColorModel, WritableRaster}
 import java.awt.Color

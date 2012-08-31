@@ -1,4 +1,4 @@
-name := "scala-images"
+name := "cuttr"
 
 organization := "com.rumblesan"
 
