@@ -3,8 +3,7 @@ package com.rumblesan.cuttr
 import java.awt.Color
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
-import java.io.File
-import java.io.IOException;
+import java.io.{File, IOException}
 import scala.util.Random
 import java.util.Date
 import math._
@@ -13,10 +12,18 @@ import RichBufferedImage._
 import RichColor._
 
 object Cuttr {
+
   def main(args: Array[String]) {
+    Arguments(args) map { config =>
+      run(config)
+    }
+  }
+
+
+  def run(config:Config) {
 
     val input = try {
-      Some(ImageIO.read(new File("landscape.jpeg")))
+      Some(ImageIO.read(new File(config.inputfile)))
     } catch {
       case ioe: IOException => {
         None
