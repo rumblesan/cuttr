@@ -1,3 +1,5 @@
+import AssemblyKeys._
+
 name := "cuttr"
 
 organization := "com.rumblesan"
@@ -12,4 +14,6 @@ libraryDependencies := Seq(
 )
 
 resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
+
+assemblySettings
 
