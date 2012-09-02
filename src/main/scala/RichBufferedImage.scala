@@ -23,7 +23,7 @@ case class RichBufferedImage(image:BufferedImage) {
 
 object RichBufferedImage {
 
-  implicit def bufferedImage2RichBufferedImage(image:BufferedImage) = RichBufferedImage(image)
+  implicit def bufferedImage2RichBufferedImage(image:BufferedImage):RichBufferedImage = RichBufferedImage(image)
 
 }
 

@@ -24,6 +24,7 @@ case class RichColor(color:Color) {
 
 object RichColor {
 
-  implicit def Color2RichColor(color:Color) = RichColor(color)
+  implicit def Color2RichColor(color:Color):RichColor = RichColor(color)
+
 }
 
