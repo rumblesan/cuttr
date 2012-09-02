@@ -3,6 +3,9 @@ package com.rumblesan.cuttr
 import java.awt.image.{BufferedImage, ColorModel, WritableRaster}
 import java.awt.Color
 
+import RichBufferedImage._
+import RichColor._
+
 case class RichBufferedImage(image:BufferedImage) {
 
   def getPixel(xVal:Int, yVal:Int) = {
