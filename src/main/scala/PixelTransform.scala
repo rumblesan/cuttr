@@ -1,30 +1,23 @@
 package com.rumblesan.cuttr
 
+import Numeric._
+
 object PixelTransform {
 
-  def funcVar(width:Int, height:Int, xFunc:(Int => Int), yFunc:(Int => Int)) = {
+  def funcVar[T](width:Int, height:Int, xFunc:(Int => T), yFunc:(Int => T))(implicit n:Numeric[T]) = {
     (x:Int, y:Int) => {
-      (inRange(0, width,  xFunc(x)),
-       inRange(0, height, yFunc(y)))
+      (inRange(width,  xFunc(x)),
+       inRange(height, yFunc(y)))
     }
   }
 
-  def shift(width:Int, height:Int, xShift:Int, yShift:Int) = {
-
-    (x:Int, y:Int) => {
-      (inRange(0, width,  x + xShift),
-       inRange(0, height, y + yShift))
-    }
-
-  }
-
-  def inRange(min:Int, max:Int, value:Int) = {
-    val range = (max + 1) - min
-    val wrapped = (value - min) % range
-    if (wrapped < 0) {
-      (wrapped + max) + 1
+  def inRange[T](max:Int, value:T)(implicit n:Numeric[T]) = {
+    if (n.gteq(value, n.fromInt(max))) {
+      n.minus(value, n.fromInt(max))
+    } else if (n.lt(value, n.zero)) {
+      n.plus(value, n.fromInt(max))
     } else {
-      wrapped + min
+      value
     }
   }
 

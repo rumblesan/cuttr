@@ -37,8 +37,8 @@ object Cuttr {
 
       val (width, height) = image.getSize()
 
-      val shiftXFunc = (pos:Int) => { round(randXShift + pos + (10 * cos(pos))).toInt}
-      val shiftYFunc = (pos:Int) => { round(randYShift + pos + (10 * cos(pos))).toInt}
+      val shiftXFunc = (pos:Int) => {randXShift + pos + (10 * cos(pos))}
+      val shiftYFunc = (pos:Int) => {randYShift + pos + (10 * cos(pos))}
 
       val shifter = PixelTransform.funcVar(width-1, height-1, shiftXFunc, shiftYFunc)
 
@@ -50,7 +50,7 @@ object Cuttr {
           val originalColor = image.getPixel(x, y)
 
           val (redX, redY) = shifter(x, y)
-          val (greenX, greenY) = shifter(redX, redY)
+          val (greenX, greenY) = shifter(redX.toInt, redY.toInt)
 
           val prevRed = image.getPixel(redX, redY).scale(0.5)
           val prevGreen = image.getPixel(greenX, greenY).scale(0)
