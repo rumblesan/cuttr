@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import java.io.{File, IOException}
 import scala.util.Random
-import java.util.Date
 import math._
 
 import RichBufferedImage._
@@ -32,8 +31,7 @@ object Cuttr {
 
     inputfile map { image =>
 
-      val timestamp = new Date().getTime()
-      val rand = new Random(timestamp)
+      val rand = new Random()
       val randXShift = rand.nextDouble() * 100
       val randYShift = rand.nextDouble() * 100
 
