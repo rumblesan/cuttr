@@ -4,7 +4,10 @@ import Numeric._
 
 object PixelTransform {
 
-
+  implicit def PairDouble2PairInt(c:Pair[Double,Double]):Pair[Int,Int] = {
+    (c._1.toInt, c._2.toInt)
+  }
+  
   def pixelTransform[T](width:Int, height:Int, xFunc:(Int => T), yFunc:(Int => T))(implicit n:Numeric[T]) = {
     (coords:Pair[Int,Int]) => {
       (inRange(width,  xFunc(coords._1)),
