@@ -58,6 +58,13 @@ case class RichBufferedImage(image:BufferedImage) {
     (width, height)
   }
 
+  def deepClone():BufferedImage = {
+    new BufferedImage(image.getColorModel(),
+                      image.copyData(null),
+                      image.isAlphaPremultiplied(),
+                      null)
+  }
+
 }
 
 object RichBufferedImage {
