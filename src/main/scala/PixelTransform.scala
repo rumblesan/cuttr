@@ -4,7 +4,8 @@ import Numeric._
 
 object PixelTransform {
 
-  def funcVar[T](width:Int, height:Int, xFunc:(Int => T), yFunc:(Int => T))(implicit n:Numeric[T]) = {
+
+  def pixelTransform[T](width:Int, height:Int, xFunc:(Int => T), yFunc:(Int => T))(implicit n:Numeric[T]) = {
     (coords:Pair[Int,Int]) => {
       (inRange(width,  xFunc(coords._1)),
        inRange(height, yFunc(coords._2)))
