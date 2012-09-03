@@ -8,6 +8,7 @@ import scala.util.Random
 import math._
 
 import RichBufferedImage._
+import PixelTransform._
 import RichColor._
 
 object Cuttr {
@@ -37,29 +38,68 @@ object Cuttr {
 
       val (width, height) = image.getSize()
 
-      val shiftXFunc = (pos:Int) => {randXShift + pos + (10 * cos(pos))}
+      val shiftXFunc = (pos:Int) => {randXShift + pos + (100 * cos(pos))}
       val shiftYFunc = (pos:Int) => {randYShift + pos + (10 * cos(pos))}
 
-      val shifter = PixelTransform.funcVar(width-1, height-1, shiftXFunc, shiftYFunc)
+      val rand1 = rand.nextInt(200)
+      val rand2 = rand.nextInt(height - 300) + 300
+      val rand3 = rand.nextInt(40)
 
-      val output = new BufferedImage(width, height, image.getType())
+      val cutFunc = (pos:Int) => {
+        if (rand1 < pos & pos < rand2) {
+          pos + rand3
+        } else {
+          pos
+        }
+      }
+
+      val rand4 = rand.nextInt(300)
+      val rand5 = rand.nextInt(height - 100) + 300
+      val rand6 = rand.nextInt(40)
+
+      val cutFunc2 = (pos:Int) => {
+        if (rand4 < pos & pos < rand5) {
+          pos + rand6
+        } else {
+          pos
+        }
+      }
+
+      val shifter = pixelTransform(width-1, height-1, shiftXFunc, shiftYFunc)
+      val cutter1 = pixelTransform(width-1, height-1, (v:Int) => v, cutFunc)
+      val cutter2 = pixelTransform(width-1, height-1, cutFunc2, (v:Int) => v)
 
       for (x <- 0 until width) {
         for (y <- 0 until height) {
 
-          val originalColor = image.getPixel(x, y)
+          val coords = (x, y)
 
-          val (redX, redY) = shifter(x, y)
-          val (greenX, greenY) = shifter(redX.toInt, redY.toInt)
+          val cut1 = image.getPixel(coords)
+          val cut1Coords = cutter1(coords)
+          image.setPixel(cut1Coords, cut1)
 
-          val prevRed = image.getPixel(redX, redY).scale(0.5)
-          val prevGreen = image.getPixel(greenX, greenY).scale(0)
+          val rShiftCoords = shifter(coords)
+          val gShiftCoords = shifter(rShiftCoords)
+          val bShiftCoords = shifter(gShiftCoords)
 
-          output.setPixel(x, y, new Color(prevRed.getRed(), prevGreen.getGreen(), originalColor.getBlue()))
+          val newRed   = image.getPixel(rShiftCoords)
+          val newGreen = image.getPixel(gShiftCoords)
+          val newBlue  = image.getPixel(bShiftCoords)
+
+          image.setRed(coords, newRed.getRed())
+          image.setGreen(coords, newGreen.getGreen())
+          image.setBlue(coords, newBlue.getBlue())
+
+          val cut2 = image.getPixel(coords)
+          val cut2Coords = cutter2(coords)
+          image.setPixel(cut2Coords, cut2)
+
+
+
         }
       }
 
-      ImageIO.write(output, "jpg", new File("output.jpeg"))
+      ImageIO.write(image, "jpg", new File("output.jpeg"))
 
     }
 
