@@ -29,6 +29,24 @@ case class RichBufferedImage(image:BufferedImage) {
     image.setRGB(x, y, c.getRGB())
   }
 
+  def setRed(x:Int, y:Int, r:Int):Unit = {
+    val c = image.getPixel(x, y)
+    val newC = new Color(r, c.getGreen(), c.getBlue())
+    image.setRGB(x, y, newC.getRGB())
+  }
+
+  def setGreen(x:Int, y:Int, g:Int):Unit = {
+    val c = image.getPixel(x, y)
+    val newC = new Color(c.getRed(), g, c.getBlue())
+    image.setRGB(x, y, newC.getRGB())
+  }
+
+  def setBlue(x:Int, y:Int, b:Int):Unit = {
+    val c = image.getPixel(x, y)
+    val newC = new Color(c.getRed(), c.getGreen(), b)
+    image.setRGB(x, y, newC.getRGB())
+  }
+
   def addPixel(x:Int, y:Int, c:Color):Unit = {
     val currentColor = image.getPixel(x,y)
     val newColor = currentColor + c
