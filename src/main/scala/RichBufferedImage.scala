@@ -8,12 +8,13 @@ import RichColor._
 
 case class RichBufferedImage(image:BufferedImage) {
 
-  def getPixel(x:Int, y:Int):Color = {
+  def getPixel(coords:Pair[Int,Int]):Color = {
+    val (x, y) = coords
     new Color (image.getRGB(x, y))
   }
 
-  def getPixel(x:Double, y:Double):Color = {
-
+  def getPixel(coords:Pair[Double,Double]):Color = {
+    val (x, y) = coords
     val a = image.getPixel((x.toInt + 0), (y.toInt + 0))
     val b = image.getPixel((x.toInt + 1), (y.toInt + 0))
     val c = image.getPixel((x.toInt + 0), (y.toInt + 1))
@@ -25,35 +26,41 @@ case class RichBufferedImage(image:BufferedImage) {
     (d * ((x % 1)) * ((y % 1)))
   }
 
-  def setPixel(x:Int, y:Int, c:Color):Unit = {
+  def setPixel(coords:Pair[Int,Int], c:Color):Unit = {
+    val (x, y) = coords
     image.setRGB(x, y, c.getRGB())
   }
 
-  def setRed(x:Int, y:Int, r:Int):Unit = {
+  def setRed(coords:Pair[Int,Int], r:Int):Unit = {
+    val (x, y) = coords
     val c = image.getPixel(x, y)
     val newC = new Color(r, c.getGreen(), c.getBlue())
     image.setRGB(x, y, newC.getRGB())
   }
 
-  def setGreen(x:Int, y:Int, g:Int):Unit = {
+  def setGreen(coords:Pair[Int,Int], g:Int):Unit = {
+    val (x, y) = coords
     val c = image.getPixel(x, y)
     val newC = new Color(c.getRed(), g, c.getBlue())
     image.setRGB(x, y, newC.getRGB())
   }
 
-  def setBlue(x:Int, y:Int, b:Int):Unit = {
+  def setBlue(coords:Pair[Int,Int], b:Int):Unit = {
+    val (x, y) = coords
     val c = image.getPixel(x, y)
     val newC = new Color(c.getRed(), c.getGreen(), b)
     image.setRGB(x, y, newC.getRGB())
   }
 
-  def addPixel(x:Int, y:Int, c:Color):Unit = {
+  def addPixel(coords:Pair[Int,Int], c:Color):Unit = {
+    val (x, y) = coords
     val currentColor = image.getPixel(x,y)
     val newColor = currentColor + c
     image.setRGB(x, y, newColor.getRGB())
   }
 
-  def addPixel(x:Double, y:Double, c:Color):Unit = {
+  def addPixel(coords:Pair[Double,Double], c:Color):Unit = {
+    val (x, y) = coords
     val a = (1 - (x % 1)) * (1 - (y % 1))
     val b = ((x % 1)) * (1 - (y % 1))
     val c = (1 - (x % 1)) * ((y % 1))
