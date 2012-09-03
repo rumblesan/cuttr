@@ -13,18 +13,22 @@ case class RichBufferedImage(image:BufferedImage) {
     new Color (image.getRGB(x, y))
   }
 
+  /*
   def getPixel(coords:Pair[Double,Double]):Color = {
-    val (x, y) = coords
-    val a = image.getPixel((x.toInt + 0), (y.toInt + 0))
-    val b = image.getPixel((x.toInt + 1), (y.toInt + 0))
-    val c = image.getPixel((x.toInt + 0), (y.toInt + 1))
-    val d = image.getPixel((x.toInt + 1), (y.toInt + 1))
+    val x = coords._1.toInt
+    val y = coords._2.toInt
+
+    val a = image.getPixel((x + 0, y + 0))
+    val b = image.getPixel((x + 1, y + 0))
+    val c = image.getPixel((x + 0, y + 1))
+    val d = image.getPixel((x + 1, y + 1))
 
     (a * (1 - (x % 1)) * (1 - (y % 1))) +
     (b * ((x % 1)) * (1 - (y % 1))) +
     (c * (1 - (x % 1)) * ((y % 1))) +
     (d * ((x % 1)) * ((y % 1)))
   }
+  */
 
   def setPixel(coords:Pair[Int,Int], c:Color):Unit = {
     val (x, y) = coords
@@ -59,23 +63,27 @@ case class RichBufferedImage(image:BufferedImage) {
     image.setRGB(x, y, newColor.getRGB())
   }
 
+  /*
   def addPixel(coords:Pair[Double,Double], c:Color):Unit = {
-    val (x, y) = coords
+    val x = coords._1.toInt
+    val y = coords._2.toInt
+
     val a = (1 - (x % 1)) * (1 - (y % 1))
     val b = ((x % 1)) * (1 - (y % 1))
     val c = (1 - (x % 1)) * ((y % 1))
     val d = ((x % 1)) * ((y % 1))
 
-    val pA = image.getPixel((x.toInt + 0), (y.toInt + 0))
-    val pB = image.getPixel((x.toInt + 1), (y.toInt + 0))
-    val pC = image.getPixel((x.toInt + 0), (y.toInt + 1))
-    val pD = image.getPixel((x.toInt + 1), (y.toInt + 1))
+    val pA = image.getPixel((x + 0, y + 0))
+    val pB = image.getPixel((x + 1, y + 0))
+    val pC = image.getPixel((x + 0, y + 1))
+    val pD = image.getPixel((x + 1, y + 1))
 
-    image.setPixel((x.toInt + 0), (y.toInt + 0), pA * a)
-    image.setPixel((x.toInt + 1), (y.toInt + 0), pB * b)
-    image.setPixel((x.toInt + 0), (y.toInt + 1), pC * c)
-    image.setPixel((x.toInt + 1), (y.toInt + 1), pD * d)
+    image.setPixel((x + 0, y + 0), pA * a)
+    image.setPixel((x + 1, y + 0), pB * b)
+    image.setPixel((x + 0, y + 1), pC * c)
+    image.setPixel((x + 1, y + 1), pD * d)
   }
+  */
 
   def getSize():Pair[Int, Int] = {
     val width  = image.getWidth()
