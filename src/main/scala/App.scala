@@ -24,11 +24,11 @@ object App {
   def getAllPhotos(tumblr:TumblrAPI, blogs:List[String], tag:String = "") = {
 
     // Fold across the blogs, getting the info from each one as a map
-    blogs.foldLeft(List.empty[Map[String,String]])(
+    val blogInfo = blogs.foldLeft(List.empty[Map[String,String]])(
       (info, blogUrl) => {
         // This will fall over if the format isn't right
         // Need to make this more generic
-        val apiResponse = Json.parse[APICall[Blog]](tumblr.get("info", blogUrl))
+        val apiResponse = Json.parse[BlogInfoAPICall](tumblr.get("info", blogUrl))
         if (apiResponse.meta.status == 200) {
           val blogInfo = apiResponse.response.blog
           Map("url" -> blogUrl, "name" -> blogInfo.url.toString, "updated" -> blogInfo.updated.toString) :: info
@@ -51,7 +51,7 @@ object App {
     }
 
     val jsonData = tumblr.get("posts", blogInfo("url"), defaultParams)
-    val apiResponse = Json.parse[APICall[BlogPosts[PhotoPost]]](jsonData)
+    val apiResponse = Json.parse[BlogPhotoAPICall](jsonData)
 
     val posts = apiResponse.response.posts
 
