@@ -38,6 +38,11 @@ object App {
       }
     )
 
+    blogInfo.flatMap(
+      blog => {
+        getBlogPhotos(tumblr, blog, tag)
+      }
+    )
   }
 
   def getBlogPhotos(tumblr:TumblrAPI, blogInfo:Map[String,String], tag:String = "") = {
@@ -55,9 +60,11 @@ object App {
 
     val posts = apiResponse.response.posts
 
+    // TODO
+    // turn this into a for comprehension
     posts.flatMap {
       post => {
-        post.photos.headOption
+        post.photos.headOption.flatMap{_.alt_sizes.headOption}
       }
     }
 
