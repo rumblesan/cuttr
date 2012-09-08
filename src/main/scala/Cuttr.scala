@@ -1,37 +1,20 @@
-package com.rumblesan.cuttr
+package com.rumblesan.cuttr.glitch
+
+import javax.imageio.ImageIO
 
 import java.awt.Color
 import java.awt.image.BufferedImage
-import javax.imageio.ImageIO
-import java.io.{File, IOException}
-import scala.util.Random
-import math._
 
 import RichBufferedImage._
 import PixelTransform._
 import RichColor._
 
-object Cuttr {
+import scala.util.Random
+import math._
 
-  def main(args: Array[String]) {
-    Arguments(args) map { config =>
-      run(config)
-    }
-  }
+class Cuttr(image:BufferedImage) {
 
-
-  def run(config:Config) {
-
-    val inputfile = try {
-      Some(ImageIO.read(new File(config.inputfile)))
-    } catch {
-      case ioe: IOException => {
-        None
-      }
-    }
-
-    inputfile map { image =>
-
+  def glitch() = {
       val rand = new Random()
       val randXShift = rand.nextDouble() * 100
       val randYShift = rand.nextDouble() * 100
@@ -93,17 +76,15 @@ object Cuttr {
           val cut2 = image.getPixel(coords)
           val cut2Coords = cutter2(coords)
           image.setPixel(cut2Coords, cut2)
-
-
-
         }
       }
 
-      ImageIO.write(image, "jpg", new File("output.jpeg"))
-
-    }
+    image
 
   }
 
 }
+
+
+
 
