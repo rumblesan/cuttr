@@ -1,5 +1,6 @@
 package com.rumblesan.cuttr
 
+import com.rumblesan.cuttr.tumblr._
 
 import javax.imageio.ImageIO
 import java.io.ByteArrayOutputStream
@@ -8,7 +9,9 @@ import java.io.{File, IOException}
 import com.rumblesan.cuttr.glitch.Cuttr
 
 import com.rumblesan.tumblr.api._
-import com.codahale.jerkson.Json._
+import com.codahale.jerkson.Json
+
+import scala.io.Source
 
 object App {
 
@@ -16,6 +19,26 @@ object App {
     Arguments(args) map { config =>
       run(config)
     }
+  }
+
+
+  def getBlogPhotos(tumblr:TumblrAPI, blogs:List[String], tag:String = "") = {
+
+    // Fold across the blogs, getting the info from each one as a map
+    blogs.foldLeft(List.empty[Map[String,String]])(
+      (info, blogUrl) => {
+        // This will fall over if the format isn't right
+        // Need to make this more generic
+        val apiResponse = Json.parse[BlogInfoResponse](tumblr.get("info", blogUrl))
+        if (apiResponse.meta.status == 200) {
+          val blogInfo = apiResponse.response.blog
+          info :: Map("name" -> blogInfo.url, "updated" -> blogInfo.updated)
+        } else {
+          info
+        }
+      }
+    )
+
   }
 
 
