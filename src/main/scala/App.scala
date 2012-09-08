@@ -5,6 +5,7 @@ import com.rumblesan.cuttr.tumblr._
 import javax.imageio.ImageIO
 import java.io.ByteArrayOutputStream
 import java.io.{File, IOException}
+import java.net.URL
 
 import com.rumblesan.cuttr.glitch.Cuttr
 
@@ -12,6 +13,8 @@ import com.rumblesan.tumblr.api._
 import com.codahale.jerkson.Json
 
 import scala.io.Source
+
+import scala.util.Random
 
 object App {
 
@@ -73,21 +76,32 @@ object App {
 
   def run(config:Config) {
 
-    val inputfile = try {
-      Some(ImageIO.read(new File(config.inputfile)))
-    } catch {
-      case ioe: IOException => {
-        None
+    val cfgSource = Source.fromFile(config.cfgfile)
+    val cfgJson   = cfgSource.mkString
+    cfgSource.close()
+
+    val cfg = Json.parse[Map[String,String]](cfgJson)
+
+    val blogSource = Source.fromFile(config.blogfile)
+    val blogList   = blogSource.getLines.toList
+    blogSource.close()
+
+    val tumblrApi = new TumblrAPI(cfg("apiKey"),
+                                  cfg("apiSecret"),
+                                  cfg("oauthToken"),
+                                  cfg("oauthSecret"))
+
+    val photos = getAllPhotos(tumblrApi, blogList, "landscape")
+
+    val selection = Random.shuffle(photos).headOption
+
+    val imageFile = selection.map(
+      imageInfo => {
+        ImageIO.read(new URL(imageInfo.url))
       }
-    }
+    )
 
-    inputfile map { image =>
-
-      val source = scala.io.Source.fromFile(config.cfgfile)
-      val lines = source.mkString
-      source.close()
-
-      val cfg = parse[Map[String,String]](lines)
+    imageFile map { image =>
 
       val glitcher = new Cuttr(image)
       val glitchedImage = glitcher.glitch()
@@ -98,20 +112,15 @@ object App {
       val imageData = baos.toByteArray()
       baos.close()
 
-      val tumblrApi = new TumblrAPI(cfg("apiKey"),
-                                    cfg("apiSecret"),
-                                    cfg("oauthToken"),
-                                    cfg("oauthSecret"))
       val params = Map("type" -> "photo",
-                       "caption" -> "Testing out Cuttr, a glitching program I'm developing",
+                       "caption" -> "Haha, looks like this is all coming together!",
                        "tags" -> "testing, glitch, generative, random")
-      /*
+
       val imgResponse = tumblrApi.post("post",
                                        "rumblesan.tumblr.com",
                                        params,
                                        imageData)
       println(imgResponse)
-      */
 
      ImageIO.write(glitchedImage, "jpg", new File("output.jpeg"))
 

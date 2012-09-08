@@ -10,8 +10,8 @@ object Arguments {
       arg("<cfgfile>", "The config file with OAuth tokens") {
         (v:String, c:Config) => c.copy(cfgfile = v)
       },
-      arg("<inputfile>", "The input JPEG to manipulate") {
-        (v:String, c:Config) => c.copy(inputfile = v)
+      arg("<blogfile>", "The list of blogs to search") {
+        (v:String, c:Config) => c.copy(blogfile = v)
       }
     )
   }
@@ -21,5 +21,5 @@ object Arguments {
   }
 }
 
-case class Config(cfgfile:String = "", inputfile:String = "")
+case class Config(cfgfile:String = "", blogfile:String = "")
 
