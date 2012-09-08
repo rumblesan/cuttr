@@ -1,4 +1,4 @@
-package com.rumblesan.cuttr
+package com.rumblesan.cuttr.glitch
 
 import java.awt.image.{BufferedImage, ColorModel, WritableRaster}
 import java.awt.Color
