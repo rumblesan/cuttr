@@ -74,6 +74,20 @@ object App {
 
   }
 
+  def createPostCaption(info:PhotoInfo) = {
+    "<a href='%s'>Original</a>" +
+    " image courtesy of " +
+    "<a href='%s'>%s</a>" +
+    "\n" +
+    "<a href='%s'> First posted</a> on %s".format(
+      info.imgUrl,
+      info.blogUrl,
+      info.blogName,
+      info.postUrl,
+      info.postDate
+    )
+  }
+
 
   def run(config:Config) {
 
