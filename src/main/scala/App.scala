@@ -16,6 +16,12 @@ import scala.io.Source
 
 import scala.util.Random
 
+case class PhotoInfo(blogName:String,
+                     blogUrl:String,
+                     postUrl:String,
+                     postDate:String,
+                     imgUrl:String)
+
 object App {
 
   def main(args: Array[String]) {
@@ -24,31 +30,20 @@ object App {
     }
   }
 
-  def getAllPhotos(tumblr:TumblrAPI, blogs:List[String], tag:String = "") = {
-
-    // Fold across the blogs, getting the info from each one as a map
-    val blogInfo = blogs.foldLeft(List.empty[Map[String,String]])(
-      (info, blogUrl) => {
-        // This will fall over if the format isn't right
-        // Need to make this more generic
-        val apiResponse = Json.parse[BlogInfoAPICall](tumblr.get("info", blogUrl))
-        if (apiResponse.meta.status == 200) {
-          val blogInfo = apiResponse.response.blog
-          Map("url" -> blogUrl, "name" -> blogInfo.url.toString, "updated" -> blogInfo.updated.toString) :: info
-        } else {
-          info
-        }
-      }
-    )
-
-    blogInfo.flatMap(
-      blog => {
-        getBlogPhotos(tumblr, blog, tag)
+  def getAllBlogInfo(tumblr:TumblrAPI, blogs:List[String]):List[BlogInfo] = {
+    // flatMap across the blogs, getting the info from each one
+    blogs.flatMap(
+      blogUrl => {
+        tumblr.get("info", blogUrl).map(
+          info => {
+            info.asInstanceOf[InfoQuery].blog
+          }
+        )
       }
     )
   }
 
-  def getBlogPhotos(tumblr:TumblrAPI, blogInfo:Map[String,String], tag:String = "") = {
+  def getBlogPhotos(tumblr:TumblrAPI, blogInfo:BlogInfo, tag:String = ""):List[PhotoInfo] = {
 
     val defaultParams = Map("type" -> "photo")
 
@@ -58,18 +53,24 @@ object App {
       defaultParams + (("tag", tag))
     }
 
-    val jsonData = tumblr.get("posts", blogInfo("url"), defaultParams)
-    val apiResponse = Json.parse[BlogPhotoAPICall](jsonData)
+    // Option[PhotoQuery]
+    val blogPosts = tumblr.get("posts", blogInfo.url, defaultParams).map(_.asInstanceOf[PhotoQuery])
 
-    val posts = apiResponse.response.posts
-
-    // TODO
-    // turn this into a for comprehension
-    posts.flatMap {
-      post => {
-        post.photos.headOption.flatMap{_.alt_sizes.headOption}
+    blogPosts.map(
+      query => {
+        query.posts.map(
+          post => {
+            val blogName = blogInfo.name
+            val blogUrl  = blogInfo.url
+            val postUrl  = post.post_url
+            val postDate = post.date
+            val photo    = post.photos.head
+            val photoSize = photo.alt_sizes.head
+            PhotoInfo(blogName, blogUrl, postUrl, postDate, photoSize.url)
+          }
+        )
       }
-    }
+    ).getOrElse(List.empty[PhotoInfo])
 
   }
 
@@ -91,13 +92,14 @@ object App {
                                   cfg("oauthToken"),
                                   cfg("oauthSecret"))
 
-    val photos = getAllPhotos(tumblrApi, blogList, "landscape")
+    val allBlogInfo = getAllBlogInfo(tumblrApi, blogList)
+    val allPhotos   = allBlogInfo.flatMap(getBlogPhotos(tumblrApi, _, "landscape"))
 
-    val selection = Random.shuffle(photos).headOption
+    val selection = Random.shuffle(allPhotos).headOption
 
     val imageFile = selection.map(
       imageInfo => {
-        ImageIO.read(new URL(imageInfo.url))
+        ImageIO.read(new URL(imageInfo.imgUrl))
       }
     )
 
