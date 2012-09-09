@@ -81,19 +81,24 @@ object App {
     val cfgJson   = cfgSource.mkString
     cfgSource.close()
 
-    val cfg = Json.parse[Map[String,String]](cfgJson)
+    val cfg = Json.parse[Map[String,Map[String,String]]](cfgJson)
 
     val blogSource = Source.fromFile(config.blogfile)
     val blogList   = blogSource.getLines.toList
     blogSource.close()
 
-    val tumblrApi = new TumblrAPI(cfg("apiKey"),
-                                  cfg("apiSecret"),
-                                  cfg("oauthToken"),
-                                  cfg("oauthSecret"))
+    val blogUrl = cfg("blog")("url")
 
+    val oauthCfg = cfg("oauth")
+
+    val tumblrApi = new TumblrAPI(oauthCfg("apiKey"),
+                                  oauthCfg("apiSecret"),
+                                  oauthCfg("oauthToken"),
+                                  oauthCfg("oauthSecret"))
+
+    val tag = cfg("search")("tag")
     val allBlogInfo = getAllBlogInfo(tumblrApi, blogList)
-    val allPhotos   = allBlogInfo.flatMap(getBlogPhotos(tumblrApi, _, "landscape"))
+    val allPhotos   = allBlogInfo.flatMap(getBlogPhotos(tumblrApi, _, tag))
 
     val selection = Random.shuffle(allPhotos).headOption
 
@@ -119,7 +124,7 @@ object App {
                        "tags" -> "testing, glitch, generative, random")
 
       val imgResponse = tumblrApi.post("post",
-                                       "rumblesan.tumblr.com",
+                                       blogUrl,
                                        params,
                                        imageData)
       println(imgResponse)
