@@ -63,10 +63,7 @@ object App {
     // Option[PhotoQuery]
     val blogPosts = tumblr.get("posts", cleanUrl, params).map(_.asInstanceOf[PhotoQuery])
 
-    println(blogInfo.url)
-    println(blogPosts)
-
-    blogPosts.map(
+    val blogPhotos = blogPosts.map(
       query => {
         query.posts.map(
           post => {
@@ -82,6 +79,9 @@ object App {
       }
     ).getOrElse(List.empty[PhotoInfo])
 
+    println("    got %d photos".format(blogPhotos.length))
+
+    blogPhotos
   }
 
   def createPostCaption(info:PhotoInfo) = {
@@ -102,6 +102,7 @@ object App {
 
   def run(config:Config) {
 
+    println("###########\n#  Cuttr  #\n###########")
     val cfgSource = Source.fromFile(config.cfgfile)
     val cfgJson   = cfgSource.mkString
     cfgSource.close()
@@ -113,31 +114,28 @@ object App {
     blogSource.close()
 
     val blogUrl = cfg("blog")("url")
-
-    val oauthCfg = cfg("oauth")
-
-    val tumblrApi = new TumblrAPI(oauthCfg("apiKey"),
-                                  oauthCfg("apiSecret"),
-                                  oauthCfg("oauthToken"),
-                                  oauthCfg("oauthSecret"))
-
-    println("Connected to Tumblr")
-
     val tag = cfg("search")("tag")
+    println("Updating %s with photos from tag %s".format(blogUrl, tag))
+
+    val tumblrApi = new TumblrAPI(cfg("oauth")("apiKey"),
+                                  cfg("oauth")("apiSecret"),
+                                  cfg("oauth")("oauthToken"),
+                                  cfg("oauth")("oauthSecret"))
+
+    println("Setting up Tumblr OAuth")
+
     val allBlogInfo = getAllBlogInfo(tumblrApi, blogList)
-    println(allBlogInfo)
     val allPhotos   = allBlogInfo.flatMap(getBlogPhotos(tumblrApi, _, tag))
 
-    println("Got %d photos".format(allPhotos.length))
+    println("Got %d photos in total".format(allPhotos.length))
     val selection = Random.shuffle(allPhotos).headOption
-    println(selection)
 
     selection.map(
       imageInfo => {
+        println("Retrieving image at url %s".format(imageInfo.imgUrl))
         val image = ImageIO.read(new URL(imageInfo.imgUrl))
 
-        println("Getting it")
-
+        println("Glitching image")
         val glitcher = new Cuttr(image)
         val glitchedImage = glitcher.glitch()
 
@@ -154,13 +152,17 @@ object App {
                          "caption" -> postCaption,
                          "tags" -> "Cuttr, glitch, generative, random")
 
+        println("Sending image to Tumblr")
         val imgResponse = tumblrApi.post("post",
                                          blogUrl,
                                          params,
-                                         imageData)
-        println(imgResponse)
-
-        ImageIO.write(glitchedImage, "jpg", new File("output.jpeg"))
+                                         imageData).map(_.asInstanceOf[PostId])
+        imgResponse match {
+          case Some(postId) => {
+            println("Post url:\n    http://%s/post/%d".format(blogUrl, postId.id))
+          }
+          case None => println("Something went wrong")
+        }
       }
     )
 
