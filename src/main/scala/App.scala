@@ -1,7 +1,5 @@
 package com.rumblesan.cuttr
 
-import com.rumblesan.cuttr.tumblr._
-
 import javax.imageio.ImageIO
 import java.io.ByteArrayOutputStream
 import java.io.{File, IOException}
