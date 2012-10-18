@@ -28,17 +28,31 @@ object App {
     }
   }
 
-  def getAllBlogInfo(tumblr:TumblrAPI, blogs:List[String]):List[BlogInfo] = {
+  def getAllBlogInfo(tumblr:TumblrAPI, blogUrls:List[String]):List[BlogInfo] = {
     // flatMap across the blogs, getting the info from each one
-    blogs.flatMap(
-      blogUrl => {
-        println("Getting info for %s".format(blogUrl))
-        tumblr.get("info", blogUrl, Map("type" -> "info")).map(
-          info => {
-            info.asInstanceOf[InfoQuery].blog
+    blogUrls.flatMap(
+
+      url => {
+        println("Getting info for %s".format(url))
+
+        tumblr.get("info", url, Map("type" -> "info")).flatMap(
+          jsonString => {
+            val queryInfo = Json.parse[TumblrInfoQueryResponse](jsonString)
+            queryInfo.meta match {
+              case Meta(200, msg) => {
+                queryInfo.response.map(_.blog)
+              }
+              case Meta(status, msg) => {
+                println("Status code %d was returned for %s".format(status, url))
+                println("    %s".format(msg))
+                None
+              }
+            }
           }
         )
+
       }
+
     )
   }
 
@@ -61,9 +75,24 @@ object App {
     val urlRegex(cleanUrl) = blogInfo.url
 
     // Option[PhotoQuery]
-    val blogPosts = tumblr.get("posts", cleanUrl, params).map(_.asInstanceOf[PhotoQuery])
+    val photoQuery: Option[PhotoQuery] = tumblr.get("posts", cleanUrl, params).flatMap(
+      jsonString => {
 
-    val blogPhotos = blogPosts.map(
+        val queryInfo = Json.parse[TumblrPhotoQueryResponse](jsonString)
+        queryInfo.meta match {
+          case Meta(200, msg) => {
+            queryInfo.response
+          }
+          case Meta(status, msg) => {
+            println("Status code %d was returned when getting photos from %s".format(status, cleanUrl))
+            println("    %s".format(msg))
+            None
+          }
+        }
+      }
+    )
+
+    val blogPhotos = photoQuery.map(
       query => {
         query.posts.map(
           post => {
@@ -153,16 +182,32 @@ object App {
                          "tags" -> "Cuttr, glitch, generative, random")
 
         println("Sending image to Tumblr")
-        val imgResponse = tumblrApi.post("post",
-                                         blogUrl,
-                                         params,
-                                         imageData).map(_.asInstanceOf[PostId])
-        imgResponse match {
-          case Some(postId) => {
-            println("Post url:\n    http://%s/post/%d".format(blogUrl, postId.id))
+        tumblrApi.post("post", blogUrl, params, imageData).map(
+          jsonString => {
+
+            val jsonResponse = Json.parse[TumblrPostResponse](jsonString)
+
+            jsonResponse.meta match {
+              case Meta(200, msg) => {
+
+                jsonResponse.response match {
+                  case Some(postId) => {
+                    println("Post url:\n    http://%s/post/%d".format(blogUrl, postId.id))
+                  }
+                  case None => println("Something went wrong")
+                }
+
+              }
+              case Meta(status, msg) => {
+                println("Status code %d was returned when creating post".format(status))
+                println("    %s".format(msg))
+                None
+              }
+            }
+
+
           }
-          case None => println("Something went wrong")
-        }
+        )
       }
     )
 
