@@ -188,7 +188,7 @@ object App {
             val jsonResponse = Json.parse[TumblrPostResponse](jsonString)
 
             jsonResponse.meta match {
-              case Meta(200, msg) => {
+              case Meta(201, msg) => {
 
                 jsonResponse.response match {
                   case Some(postId) => {
