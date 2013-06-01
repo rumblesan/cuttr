@@ -7,6 +7,8 @@ import java.net.URL
 
 import com.rumblesan.cuttr.glitch.Cuttr
 
+import com.rumblesan.util.tumblrapi.TumblrAPI
+
 import scala.io.Source
 
 import scala.util.Random
@@ -14,131 +16,22 @@ import scala.util.Random
 import com.typesafe.config._
 
 import argonaut._, Argonaut._
+import Json.JsonArray
 
-case class PhotoInfo(blogName:String,
-                     blogUrl:String,
-                     postUrl:String,
-                     postDate:String,
-                     imgUrl:String)
+import tumblr._
+
 
 object App {
 
   def main(args: Array[String]) {
-    Arguments(args) map { arguments =>
-      run(arguments)
-    }
-  }
-
-  def getAllBlogInfo(tumblr:TumblrAPI, blogUrls:List[String]):List[BlogInfo] = {
-    // flatMap across the blogs, getting the info from each one
-    blogUrls.flatMap(
-
-      url => {
-        println("Getting info for %s".format(url))
-
-        tumblr.get("info", url, Map("type" -> "info")).flatMap(
-          jsonString => {
-            val queryInfo = Json.parse[TumblrInfoQueryResponse](jsonString)
-            queryInfo.meta match {
-              case Meta(200, msg) => {
-                queryInfo.response.map(_.blog)
-              }
-              case Meta(status, msg) => {
-                println("Status code %d was returned for %s".format(status, url))
-                println("    %s".format(msg))
-                None
-              }
-            }
-          }
-        )
-
-      }
-
-    )
-  }
-
-  def getBlogPhotos(tumblr:TumblrAPI, blogInfo:BlogInfo, tag:String = ""):List[PhotoInfo] = {
-
-    println("Getting photos for %s".format(blogInfo.title))
-
-    val defaultParams = Map("type" -> "photo")
-
-    val params = if (tag.isEmpty) {
-      defaultParams
-    } else {
-      defaultParams + (("tag", tag))
-    }
-
-
-    // The API doesn't handle the leading http:// or trailing slash
-    // It bloody well should, fix it you git
-    val urlRegex = """http://(.*)/""".r
-    val urlRegex(cleanUrl) = blogInfo.url
-
-    // Option[PhotoQuery]
-    val photoQuery: Option[PhotoQuery] = tumblr.get("posts", cleanUrl, params).flatMap(
-      jsonString => {
-
-        val queryInfo = Json.parse[TumblrPhotoQueryResponse](jsonString)
-        queryInfo.meta match {
-          case Meta(200, msg) => {
-            queryInfo.response
-          }
-          case Meta(status, msg) => {
-            println("Status code %d was returned when getting photos from %s".format(status, cleanUrl))
-            println("    %s".format(msg))
-            None
-          }
-        }
-      }
-    )
-
-    val blogPhotos = photoQuery.map(
-      query => {
-        query.posts.map(
-          post => {
-            val blogName = blogInfo.name
-            val blogUrl  = blogInfo.url
-            val postUrl  = post.post_url
-            val postDate = post.date
-            val photo    = post.photos.head
-            val photoSize = photo.alt_sizes.head
-            PhotoInfo(blogName, blogUrl, postUrl, postDate, photoSize.url)
-          }
-        )
-      }
-    ).getOrElse(List.empty[PhotoInfo])
-
-    println("    got %d photos".format(blogPhotos.length))
-
-    blogPhotos
-  }
-
-  def createPostCaption(info:PhotoInfo) = {
-    val description = "<a href='%s'>Original</a>" +
-                      " image courtesy of " +
-                      "<a href='%s'>%s</a>" +
-                      "\n" +
-                      "<a href='%s'> First posted</a> on %s"
-    description.format(
-      info.imgUrl,
-      info.blogUrl,
-      info.blogName,
-      info.postUrl,
-      info.postDate
-    )
-  }
-
-
-  def run(arguments: Arguments) {
 
     val config = ConfigFactory.load()
 
     println("###########\n#  Cuttr  #\n###########")
 
-    val blogSource = Source.fromFile(arguments.blogfile)
-    val blogList   = blogSource.getLines.toList
-    blogSource.close()
+    //val blogSource = Source.fromFile(arguments.blogfile)
+    //val blogList   = blogSource.getLines.toList
+    //blogSource.close()
 
     val blogUrl = config.getString("blog.url")
     val tag = config.getString("search.tag")
@@ -150,6 +43,7 @@ object App {
                                   config.getString("oauth.oauthToken"),
                                   config.getString("oauth.oauthSecret"))
 
+    /*
     println("Setting up Tumblr OAuth")
 
     val allBlogInfo = getAllBlogInfo(tumblrApi, blogList)
@@ -209,8 +103,58 @@ object App {
         )
       }
     )
+    */
+  }
+
+  def filterPostType(posts: JsonArray, `type`: String): JsonArray = {
+    for {
+      element <- posts
+      typeField <- element.field("type")
+      typeVal <- typeField.string
+      if typeVal == `type`
+    } yield element
+  }
+
+  def getTaggedPhotos(tumblr:TumblrAPI, tag: String): Option[TumblrResponse[PostQuery[PhotoPost]]] = {
+    println("Getting photos for tag %s".format(tag))
+
+    val defaultParams = Map("type" -> "photo")
+
+    val photoPosts = for {
+      stringdata <- tumblr.get("tagged")
+      jsondata <- stringdata.parseOption
+      cursor = jsondata.cursor
+      posts <- cursor.downField("posts")
+      postArray <- posts.focus.array
+      filtered = filterPostType(postArray, tag)
+      updated = posts.set(jArray(filtered)).undo
+      output <- updated.jdecode[TumblrResponse[PostQuery[PhotoPost]]].toOption
+    } yield output
+
+    photoPosts
 
   }
+
+
+
+  /*
+  def createPostCaption(info:PhotoInfo) = {
+    val description = "<a href='%s'>Original</a>" +
+                      " image courtesy of " +
+                      "<a href='%s'>%s</a>" +
+                      "\n" +
+                      "<a href='%s'> First posted</a> on %s"
+    description.format(
+      info.imgUrl,
+      info.blogUrl,
+      info.blogName,
+      info.postUrl,
+      info.postDate
+    )
+  }
+  */
+
+
 
 }
 

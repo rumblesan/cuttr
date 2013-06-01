@@ -16,7 +16,7 @@ object ScalaGlitch extends Build {
   // Dependencies.
   lazy val specs = "org.specs2" %% "specs2" % "1.14" % "test"
   lazy val mockito = "org.mockito" % "mockito-core" % "1.8.5" % "test"
-  lazy val scopt = "com.github.scopt" %% "scopt" % "2.1.0"
+  lazy val tumblrapi = "com.rumblesan.util" %% "tumblrapi" % "0.2.0"
   lazy val argonaut = "io.argonaut" %% "argonaut" % "6.0-RC1"  
   lazy val config = "com.typesafe" % "config" % "1.0.1"
 
@@ -31,7 +31,7 @@ object ScalaGlitch extends Build {
 
     settings = buildSettings ++ Seq(
       libraryDependencies += config,
-      libraryDependencies += scopt,
+      libraryDependencies += tumblrapi,
       libraryDependencies += argonaut
     )
 

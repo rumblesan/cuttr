@@ -1,0 +1,204 @@
+package com.rumblesan.cuttr.tumblr
+
+import argonaut._, Argonaut._
+
+case class TumblrResponse[T](meta: Meta, response: Option[T])
+
+object TumblrResponse {
+  implicit def TumblrResponseDecodeJson[T](implicit typeDecode: DecodeJson[T]): DecodeJson[TumblrResponse[T]] =
+    DecodeJson(c => for {
+      meta <- (c --\ "meta").as[Meta]
+      response <- (c --\ "reponse").as[Option[T]]
+    } yield TumblrResponse(meta, response))
+}
+
+
+case class Meta(status: Int, msg: String)
+
+object Meta {
+  implicit def MetaCodecJson: CodecJson[Meta] =
+    casecodec2(Meta.apply, Meta.unapply)("status", "msg")
+}
+ 
+
+// /info
+case class BlogInfo(title: String,
+                    posts: Int,
+                    name: String,
+                    url: String,
+                    updated: Long,
+                    description: String,
+                    ask:Boolean,
+                    ask_anon:Boolean,
+                    is_nsfw:Boolean,
+                    share_likes:Boolean,
+                    likes: Int)
+
+object BlogInfo {
+  implicit def BlogInfoCodecJson: CodecJson[BlogInfo] =
+    casecodec11(BlogInfo.apply, BlogInfo.unapply)("title",
+                                                  "posts",
+                                                  "name",
+                                                  "url",
+                                                  "updated",
+                                                  "description",
+                                                  "ask",
+                                                  "ask_anon",
+                                                  "is_nsfw",
+                                                  "share_likes",
+                                                  "likes")
+}
+
+
+// /likes
+case class LikedPosts(liked_posts: List[AnyPost], liked_count: Int)
+
+object LikedPosts {
+  implicit def LikedPostsCodecJson: CodecJson[LikedPosts] =
+    casecodec2(LikedPosts.apply, LikedPosts.unapply)("liked_posts", "liked_count")
+}
+
+
+
+// /followers
+
+case class Followers(total_users: Int, users: List[User])
+
+object Followers {
+  implicit def FollowersCodecJson: CodecJson[Followers] =
+    casecodec2(Followers.apply, Followers.unapply)("total_users", "users")
+}
+
+
+case class User(name: String,
+                url: String,
+                updated: Long)
+object User {
+  implicit def UserCodecJson: CodecJson[User] =
+    casecodec3(User.apply, User.unapply)("name", "url", "updated")
+}
+
+
+
+case class PostQuery[T](blog:BlogInfo, posts: List[T], total_posts: Int)
+
+object PostQuery {
+  implicit def PostQueryDecodeJson[T](implicit typeDecode: DecodeJson[T]): DecodeJson[PostQuery[T]] =
+    DecodeJson(c => for {
+      blog <- (c --\ "blog").as[BlogInfo]
+      posts <- (c --\ "posts").as[List[T]]
+      total_posts <- (c --\ "total_posts").as[Int]
+    } yield PostQuery(blog, posts, total_posts))
+}
+
+
+// Post types
+
+// This is just a generic class that should cover all post types
+case class AnyPost(blog_name: String,
+                   id: Long,
+                   post_url: String,
+                   `type`: String)
+object AnyPost {
+  implicit def AnyPostCodecJson: CodecJson[AnyPost] =
+    casecodec4(AnyPost.apply, AnyPost.unapply)("blog_name", "id", "post_url", "type")
+}
+
+
+
+
+case class TextPost(blog_name: String,
+                    id: Long,
+                    post_url: String,
+                    slug: String,
+                    `type`: String,
+                    date: String,
+                    timestamp: Long,
+                    state: String,
+                    format: String,
+                    reblog_key: String,
+                    tags: List[String],
+                    short_url: String,
+                    note_count: Int,
+                    title: String,
+                    body: String)
+
+object TextPost {
+  implicit def TextPostCodecJson: CodecJson[TextPost] =
+    casecodec15(TextPost.apply, TextPost.unapply)("blog_name",
+                                                  "id",
+                                                  "post_url",
+                                                  "slug",
+                                                  "type",
+                                                  "date",
+                                                  "timestamp",
+                                                  "state",
+                                                  "format",
+                                                  "reblog_key",
+                                                  "tags",
+                                                  "short_url",
+                                                  "note_count",
+                                                  "title",
+                                                  "body")
+}
+
+
+
+case class PhotoPost(blog_name: String,
+                     id: Long,
+                     post_url: String,
+                     slug: String,
+                     `type`: String,
+                     date: String,
+                     timestamp: Long,
+                     state: String,
+                     format: String,
+                     reblog_key: String,
+                     tags: List[String],
+                     short_url: String,
+                     source_url: Option[String],
+                     source_title: Option[String],
+                     note_count: Int,
+                     caption: String,
+                     link_url: Option[String],
+                     image_permalink: String,
+                     photos: List[Photo])
+object PhotoPost {
+  implicit def PhotoPostCodecJson: CodecJson[PhotoPost] =
+    casecodec19(PhotoPost.apply, PhotoPost.unapply)("blog_name",
+                                                    "id",
+                                                    "post_url",
+                                                    "slug",
+                                                    "type",
+                                                    "date",
+                                                    "timestamp",
+                                                    "state",
+                                                    "format",
+                                                    "reblog_key",
+                                                    "tags",
+                                                    "short_url",
+                                                    "source_url",
+                                                    "source_title",
+                                                    "note_count",
+                                                    "caption",
+                                                    "link_url",
+                                                    "image_permalink",
+                                                    "photos")
+}
+
+
+case class Photo(caption: String, alt_sizes: List[PhotoSize], original_size: PhotoSize)
+object Photo {
+  implicit def PhotoCodecJson: CodecJson[Photo] =
+    casecodec3(Photo.apply, Photo.unapply)("caption", "alt_sizes", "original_size")
+}
+
+
+case class PhotoSize(width: Int, height: Int, url: String)
+object PhotoSize {
+  implicit def PhotoSizeCodecJson: CodecJson[PhotoSize] =
+    casecodec3(PhotoSize.apply, PhotoSize.unapply)("width", "height", "url")
+}
+
+
+
