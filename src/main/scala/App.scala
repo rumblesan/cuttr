@@ -7,12 +7,13 @@ import java.net.URL
 
 import com.rumblesan.cuttr.glitch.Cuttr
 
-import com.rumblesan.tumblr.api._
-import com.codahale.jerkson.Json
-
 import scala.io.Source
 
 import scala.util.Random
+
+import com.typesafe.config._
+
+import argonaut._, Argonaut._
 
 case class PhotoInfo(blogName:String,
                      blogUrl:String,
@@ -23,8 +24,8 @@ case class PhotoInfo(blogName:String,
 object App {
 
   def main(args: Array[String]) {
-    Arguments(args) map { config =>
-      run(config)
+    Arguments(args) map { arguments =>
+      run(arguments)
     }
   }
 
@@ -129,27 +130,25 @@ object App {
   }
 
 
-  def run(config:Config) {
+  def run(arguments: Arguments) {
+
+    val config = ConfigFactory.load()
 
     println("###########\n#  Cuttr  #\n###########")
-    val cfgSource = Source.fromFile(config.cfgfile)
-    val cfgJson   = cfgSource.mkString
-    cfgSource.close()
 
-    val cfg = Json.parse[Map[String,Map[String,String]]](cfgJson)
-
-    val blogSource = Source.fromFile(config.blogfile)
+    val blogSource = Source.fromFile(arguments.blogfile)
     val blogList   = blogSource.getLines.toList
     blogSource.close()
 
-    val blogUrl = cfg("blog")("url")
-    val tag = cfg("search")("tag")
+    val blogUrl = config.getString("blog.url")
+    val tag = config.getString("search.tag")
+
     println("Updating %s with photos from tag %s".format(blogUrl, tag))
 
-    val tumblrApi = new TumblrAPI(cfg("oauth")("apiKey"),
-                                  cfg("oauth")("apiSecret"),
-                                  cfg("oauth")("oauthToken"),
-                                  cfg("oauth")("oauthSecret"))
+    val tumblrApi = new TumblrAPI(config.getString("oauth.apiKey"),
+                                  config.getString("oauth.apiSecret"),
+                                  config.getString("oauth.oauthToken"),
+                                  config.getString("oauth.oauthSecret"))
 
     println("Setting up Tumblr OAuth")
 
