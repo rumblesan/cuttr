@@ -1,4 +1,4 @@
-package com.rumblesan.cuttr.glitch
+package com.rumblesan.scalaglitch
 
 import java.awt.Color
 

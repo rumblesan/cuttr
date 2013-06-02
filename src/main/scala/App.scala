@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream
 import java.io.{File, IOException}
 import java.net.URL
 
-import com.rumblesan.cuttr.glitch.Cuttr
+import com.rumblesan.scalaglitch.Cuttr
 
 import com.rumblesan.util.tumblrapi.TumblrAPI
 
