@@ -35,6 +35,8 @@ object ScalaGlitch extends Build {
       libraryDependencies += argonaut
     )
 
+  ).settings(
+    scalacOptions ++= Seq("-feature", "-language:_")
   ) aggregate(scalaglitch)
 
   lazy val scalaglitch = Project(
