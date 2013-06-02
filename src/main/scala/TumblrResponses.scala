@@ -2,13 +2,13 @@ package com.rumblesan.cuttr.tumblr
 
 import argonaut._, Argonaut._
 
-case class TumblrResponse[T](meta: Meta, response: Option[T])
+case class TumblrResponse[T](meta: Meta, response: T)
 
 object TumblrResponse {
   implicit def TumblrResponseDecodeJson[T](implicit typeDecode: DecodeJson[T]): DecodeJson[TumblrResponse[T]] =
     DecodeJson(c => for {
       meta <- (c --\ "meta").as[Meta]
-      response <- (c --\ "reponse").as[Option[T]]
+      response <- (c --\ "response").as[T]
     } yield TumblrResponse(meta, response))
 }
 
@@ -20,7 +20,13 @@ object Meta {
     casecodec2(Meta.apply, Meta.unapply)("status", "msg")
 }
  
+case class PostId(id: Long)
 
+object PostId {
+  implicit def PostIdCodecJson: CodecJson[PostId] =
+    casecodec1(PostId.apply, PostId.unapply)("id")
+}
+ 
 // /info
 case class BlogInfo(title: String,
                     posts: Int,
@@ -156,16 +162,12 @@ case class PhotoPost(blog_name: String,
                      reblog_key: String,
                      tags: List[String],
                      short_url: String,
-                     source_url: Option[String],
-                     source_title: Option[String],
                      note_count: Int,
                      caption: String,
-                     link_url: Option[String],
-                     image_permalink: String,
                      photos: List[Photo])
 object PhotoPost {
   implicit def PhotoPostCodecJson: CodecJson[PhotoPost] =
-    casecodec19(PhotoPost.apply, PhotoPost.unapply)("blog_name",
+    casecodec15(PhotoPost.apply, PhotoPost.unapply)("blog_name",
                                                     "id",
                                                     "post_url",
                                                     "slug",
@@ -177,12 +179,8 @@ object PhotoPost {
                                                     "reblog_key",
                                                     "tags",
                                                     "short_url",
-                                                    "source_url",
-                                                    "source_title",
                                                     "note_count",
                                                     "caption",
-                                                    "link_url",
-                                                    "image_permalink",
                                                     "photos")
 }
 
