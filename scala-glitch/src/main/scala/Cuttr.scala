@@ -14,7 +14,7 @@ import math._
 
 class Cuttr(image:BufferedImage) {
 
-  def glitch() = {
+  def glitch(): BufferedImage = {
       val rand = new Random()
       val randXShift = rand.nextDouble() * 100
       val randYShift = rand.nextDouble() * 100
