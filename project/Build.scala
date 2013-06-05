@@ -29,7 +29,7 @@ object ScalaGlitch extends Build {
     id = "cuttr",
     base = file("."),
 
-    settings = buildSettings ++ Seq(
+    settings = defaultSettings ++ Seq(
       libraryDependencies += config,
       libraryDependencies += tumblrapi,
       libraryDependencies += argonaut
