@@ -36,6 +36,8 @@ object App {
 
   lazy val tag = config.getString("cuttr.search.tag")
 
+  lazy val glitchType = config.getString("cuttr.glitch.type")
+
   def main(args: Array[String]) {
 
     println("###########\n#  Cuttr  #\n###########")
@@ -85,7 +87,12 @@ object App {
 
     println("Glitching image")
     val glitcher = new Cuttr(image)
-    val glitchedImage = glitcher.glitch()
+
+    val glitchedImage = glitchType match {
+      case "smear" => glitcher.smear()
+      case "cubist" => glitcher.cubist()
+      case _ => glitcher.smear()
+    }
 
     val baos = new ByteArrayOutputStream()
     ImageIO.write(glitchedImage, "jpg", baos)
