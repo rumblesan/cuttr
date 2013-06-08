@@ -12,54 +12,39 @@ import RichColor._
 import scala.util.Random
 import math._
 
+import Numeric._
+
+
 class Cuttr(image:BufferedImage) {
 
+  val cuttrrand = new Random()
+
   def glitch(): BufferedImage = {
+    cubist()
+  }
+
+
+  def smear(): BufferedImage = {
       val rand = new Random()
+
       val randXShift = rand.nextDouble() * 100
       val randYShift = rand.nextDouble() * 100
 
       val (width, height) = image.getSize()
 
-      val shiftXFunc = (pos:Int) => {randXShift + pos + (100 * cos(pos))}
-      val shiftYFunc = (pos:Int) => {randYShift + pos + (10 * cos(pos))}
-
-      val rand1 = rand.nextInt(200)
-      val rand2 = rand.nextInt(height - 300) + 300
-      val rand3 = rand.nextInt(40)
-
-      val cutFunc = (pos:Int) => {
-        if (rand1 < pos & pos < rand2) {
-          pos + rand3
-        } else {
-          pos
-        }
+      val shiftXFunc = (pos:Int) => {
+        randXShift + pos + (100 * cos(pos))
       }
-
-      val rand4 = rand.nextInt(300)
-      val rand5 = rand.nextInt(height - 100) + 300
-      val rand6 = rand.nextInt(40)
-
-      val cutFunc2 = (pos:Int) => {
-        if (rand4 < pos & pos < rand5) {
-          pos + rand6
-        } else {
-          pos
-        }
+      val shiftYFunc = (pos:Int) => {
+        randYShift + pos + (10 * cos(pos))
       }
 
       val shifter = pixelTransform(width-1, height-1, shiftXFunc, shiftYFunc)
-      val cutter1 = pixelTransform(width-1, height-1, (v:Int) => v, cutFunc)
-      val cutter2 = pixelTransform(width-1, height-1, cutFunc2, (v:Int) => v)
 
       for (x <- 0 until width) {
         for (y <- 0 until height) {
 
           val coords = (x, y)
-
-          val cut1 = image.getPixel(coords)
-          val cut1Coords = cutter1(coords)
-          image.setPixel(cut1Coords, cut1)
 
           val rShiftCoords = shifter(coords)
           val gShiftCoords = shifter(rShiftCoords)
@@ -73,15 +58,65 @@ class Cuttr(image:BufferedImage) {
           image.setGreen(coords, newGreen.getGreen())
           image.setBlue(coords, newBlue.getBlue())
 
-          val cut2 = image.getPixel(coords)
-          val cut2Coords = cutter2(coords)
-          image.setPixel(cut2Coords, cut2)
         }
       }
 
     image
 
   }
+
+  def cubist(): BufferedImage = {
+
+      val (width, height) = image.getSize()
+
+      val shifters = (1 to 30).map(v => createPixelTransform(width, height))
+
+      for (x <- 0 until width) {
+        for (y <- 0 until height) {
+
+          val coords = (x, y)
+
+          for (s <- shifters) {
+            image.setPixel(coords, image.getPixel(s(coords)))
+          }
+
+        }
+      }
+
+    image
+
+  }
+
+  def createPixelTransform(width: Int, height: Int) = {
+
+    val randXShift = cuttrrand.nextDouble() * (width / 3)
+    val randYShift = cuttrrand.nextDouble() * (height / 3)
+
+    val xShifter = createPixelShifter(randXShift.toInt, width)
+    val yShifter = createPixelShifter(randYShift.toInt, height)
+
+    pixelTransform(width-1, height-1, xShifter, yShifter)
+
+  }
+
+  def createPixelShifter(dist: Int, size: Int): (Int) => Double = {
+
+    val rand1 = (cuttrrand.nextDouble() * (size / 4)) + (size / 5)
+    val rand2 = (cuttrrand.nextDouble() * (size / 4)) + (size / 3)
+
+    (pos:Int) => {
+
+      if (pos < rand2 && pos > rand1) {
+        (pos + dist).toDouble
+      } else {
+        pos.toDouble
+      }
+
+    }
+
+
+  }
+
 
 }
 
