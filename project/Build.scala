@@ -1,5 +1,7 @@
 import sbt._
 import sbt.Keys._
+import sbtassembly.Plugin._
+import AssemblyKeys._
 
 object ScalaGlitch extends Build {
 
@@ -29,7 +31,7 @@ object ScalaGlitch extends Build {
     id = "cuttr",
     base = file("."),
 
-    settings = defaultSettings ++ Seq(
+    settings = defaultSettings ++ assemblySettings ++ Seq(
       libraryDependencies += config,
       libraryDependencies += tumblrapi,
       libraryDependencies += argonaut
