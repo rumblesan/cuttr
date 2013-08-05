@@ -34,7 +34,9 @@ object ScalaGlitch extends Build {
     settings = defaultSettings ++ assemblySettings ++ Seq(
       libraryDependencies += config,
       libraryDependencies += tumblrapi,
-      libraryDependencies += argonaut
+      libraryDependencies += argonaut,
+      jarName in assembly := "cuttr.jar",
+      target in assembly := file("./assembled")
     )
 
   ) dependsOn(scalaglitch)
