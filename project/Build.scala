@@ -9,7 +9,7 @@ object ScalaGlitch extends Build {
 
     organization := "com.rumblesan",
 
-    scalaVersion := "2.10.1",
+    scalaVersion := "2.10.3",
 
     version := "0.2"
 
