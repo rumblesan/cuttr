@@ -11,7 +11,7 @@ object ScalaGlitch extends Build {
 
     scalaVersion := "2.10.3",
 
-    version := "0.2"
+    version := "0.3"
 
   )
 
@@ -46,7 +46,7 @@ object ScalaGlitch extends Build {
     base = file("scala-glitch"),
     settings = defaultSettings
   ).settings(
-    scalacOptions ++= Seq("-feature", "-language:_")
+    scalacOptions ++= Seq("-feature", "-language:_", "-deprecation")
   )
 
 }
