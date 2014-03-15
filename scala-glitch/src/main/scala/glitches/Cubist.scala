@@ -13,11 +13,15 @@ object Cubist {
 
   val cuttrrand = new Random()
 
+  type PixelShifter = Pair[Int, Int] => Pair[Int, Int]
+
   def apply(image: BufferedImage): BufferedImage = {
 
     val (width, height) = image.getSize()
 
-    val shifters = (1 to 30).map(v => createPixelTransform(width, height))
+    val shifters: Seq[PixelShifter] = (1 to 30).map(v => createPixelTransform(width, height))
+
+
 
     for (x <- 0 until width) {
       for (y <- 0 until height) {
@@ -30,7 +34,7 @@ object Cubist {
     image
   }
 
-  def createPixelTransform(width: Int, height: Int): Pair[Int, Int] => Pair[Int, Int] = {
+  def createPixelTransform(width: Int, height: Int): PixelShifter = {
 
     val randXShift = cuttrrand.nextDouble() * (width / 3)
     val randYShift = cuttrrand.nextDouble() * (height / 3)
