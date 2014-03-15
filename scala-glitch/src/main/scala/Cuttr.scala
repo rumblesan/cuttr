@@ -6,7 +6,7 @@ import java.awt.Color
 import java.awt.image.BufferedImage
 
 import RichBufferedImage._
-import PixelTransform._
+import CoordWrapper.wrapCoords
 import RichColor._
 
 import scala.util.Random
@@ -33,13 +33,13 @@ class Cuttr(image:BufferedImage) {
       val (width, height) = image.getSize()
 
       val shiftXFunc = (pos:Int) => {
-        randXShift + pos + (100 * cos(pos))
+        (randXShift + pos + (100 * cos(pos))).toInt
       }
       val shiftYFunc = (pos:Int) => {
         randYShift + pos + (10 * cos(pos))
       }
 
-      val shifter = pixelTransform(width-1, height-1, shiftXFunc, shiftYFunc)
+      val shifter = wrapCoords(width-1, height-1, shiftXFunc, shiftYFunc)
 
       for (x <- 0 until width) {
         for (y <- 0 until height) {
@@ -95,7 +95,7 @@ class Cuttr(image:BufferedImage) {
     val xShifter = createPixelShifter(randXShift.toInt, width)
     val yShifter = createPixelShifter(randYShift.toInt, height)
 
-    pixelTransform(width-1, height-1, xShifter, yShifter)
+    wrapCoords(width-1, height-1, xShifter, yShifter)
 
   }
 
