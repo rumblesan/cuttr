@@ -1,7 +1,6 @@
 package com.rumblesan.cuttr
 
 import javax.imageio.ImageIO
-import java.io.ByteArrayOutputStream
 import java.io.{File, IOException}
 import java.net.URL
 
@@ -61,7 +60,7 @@ object App {
             Map("type" -> "photo",
                 "caption" -> createPostCaption(photo),
                 "tags" -> "Cuttr, glitch, generative, random, %s".format(tag)),
-            glitchImage(photo)
+            glitchImage(photo, glitchType)
           )
           response <- jsondata.decodeOption[TumblrResponse[PostId]]
         } yield response).map(response =>
@@ -82,19 +81,17 @@ object App {
 
   }
 
-  def glitchImage(photo: Photo): Array[Byte] = {
-    val image = ImageIO.read(new URL(photo.imgUrl))
+  def glitchImage(photo: Photo, glitch: String): Array[Byte] = {
 
     println("Glitching image")
 
-    val glitchedImage = Glitchr(image, glitchType)
+    Glitchr(
+      ImageIO.read(
+        new URL(photo.imgUrl)
+      ),
+      glitch
+    )
 
-    val baos = new ByteArrayOutputStream()
-    ImageIO.write(glitchedImage, "jpg", baos)
-    baos.flush()
-    val imageData = baos.toByteArray()
-    baos.close()
-    imageData
   }
 
   def getTaggedPhotos(tumblr:TumblrAPI, tag: String): Option[List[PhotoPost]] = {
