@@ -1,4 +1,4 @@
-package com.rumblesan.scalaglitch
+package com.rumblesan.scalaglitch.util
 
 import java.awt.image.{BufferedImage, ColorModel, WritableRaster}
 import java.awt.Color
