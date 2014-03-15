@@ -30,7 +30,7 @@ object Cubist {
     image
   }
 
-  def createPixelTransform(width: Int, height: Int) = {
+  def createPixelTransform(width: Int, height: Int): Pair[Int, Int] => Pair[Int, Int] = {
 
     val randXShift = cuttrrand.nextDouble() * (width / 3)
     val randYShift = cuttrrand.nextDouble() * (height / 3)
