@@ -9,13 +9,14 @@ import com.rumblesan.scalaglitch.util.RichBufferedImage._
 import com.rumblesan.scalaglitch.util.CoordWrapper.wrapCoords
 import com.rumblesan.scalaglitch.util.RichColor._
 
+import com.rumblesan.scalaglitch.types.GlitchTypes
+import com.rumblesan.scalaglitch.types.GlitchedImages._
+
 import java.awt.image.BufferedImage
 
-object Smear {
+object Smear extends GlitchTypes {
 
-  type PixelShifter = Pair[Int, Int] => Pair[Int, Int]
-
-  def apply(image: BufferedImage): BufferedImage = image.createGlitch(runSmear)
+  def apply(image: BufferedImage): GlitchedImage = GlitchedJpeg(image.createGlitch(runSmear))
 
   val runSmear: BufferedImage => BufferedImage = image => {
 
