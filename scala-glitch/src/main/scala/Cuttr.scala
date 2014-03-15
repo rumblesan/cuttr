@@ -36,7 +36,7 @@ class Cuttr(image:BufferedImage) {
         (randXShift + pos + (100 * cos(pos))).toInt
       }
       val shiftYFunc = (pos:Int) => {
-        randYShift + pos + (10 * cos(pos))
+        (randYShift + pos + (10 * cos(pos))).toInt
       }
 
       val shifter = wrapCoords(width-1, height-1, shiftXFunc, shiftYFunc)
@@ -99,7 +99,7 @@ class Cuttr(image:BufferedImage) {
 
   }
 
-  def createPixelShifter(dist: Int, size: Int): (Int) => Double = {
+  def createPixelShifter(dist: Int, size: Int): Int => Int = {
 
     val rand1 = (cuttrrand.nextDouble() * (size / 4)) + (size / 5)
     val rand2 = (cuttrrand.nextDouble() * (size / 4)) + (size / 3)
@@ -107,9 +107,9 @@ class Cuttr(image:BufferedImage) {
     (pos:Int) => {
 
       if (pos < rand2 && pos > rand1) {
-        (pos + dist).toDouble
+        (pos + dist)
       } else {
-        pos.toDouble
+        pos
       }
 
     }
