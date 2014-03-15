@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream
 import java.io.{File, IOException}
 import java.net.URL
 
-import com.rumblesan.scalaglitch.Cuttr
+import com.rumblesan.scalaglitch.Glitchr
 
 import com.rumblesan.util.tumblrapi.TumblrAPI
 
@@ -87,7 +87,7 @@ object App {
 
     println("Glitching image")
 
-    val glitchedImage = Cuttr(image, glitchType)
+    val glitchedImage = Glitchr(image, glitchType)
 
     val baos = new ByteArrayOutputStream()
     ImageIO.write(glitchedImage, "jpg", baos)

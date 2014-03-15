@@ -5,7 +5,7 @@ import glitches._
 import java.awt.image.BufferedImage
 
 
-object Cuttr {
+object Glitchr {
 
   def apply(image: BufferedImage, glitchType: String): BufferedImage = {
     glitchType match {
