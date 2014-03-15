@@ -1,5 +1,7 @@
 package com.rumblesan.scalaglitch
 
+import glitches._
+
 import javax.imageio.ImageIO
 
 import java.awt.Color
@@ -24,21 +26,23 @@ class Cuttr(image:BufferedImage) {
   }
 
 
-  def smear(): BufferedImage = {
-      val rand = new Random()
+  def smear(): BufferedImage = Smear(image)
 
-      val randXShift = rand.nextDouble() * 100
-      val randYShift = rand.nextDouble() * 100
+  def pushed(): List[BufferedImage] = {
+
+    val rand = new Random()
+
+    val frames = rand.nextInt(100) + 10
+
+    val shiftGenerator: Int => Int => (Int => Int) = shift => multiplier => {
+      (pos: Int) => {
+        (shift + pos + (multiplier * cos(pos))).toInt
+      }
+    }
+
+    val glitcher: BufferedImage => (Int => Int) => (Int => Int) => BufferedImage = image => shiftXFunc => shiftYFunc => {
 
       val (width, height) = image.getSize()
-
-      val shiftXFunc = (pos:Int) => {
-        (randXShift + pos + (100 * cos(pos))).toInt
-      }
-      val shiftYFunc = (pos:Int) => {
-        (randYShift + pos + (10 * cos(pos))).toInt
-      }
-
       val shifter = wrapCoords(width-1, height-1, shiftXFunc, shiftYFunc)
 
       for (x <- 0 until width) {
