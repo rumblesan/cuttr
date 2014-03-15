@@ -86,13 +86,8 @@ object App {
     val image = ImageIO.read(new URL(photo.imgUrl))
 
     println("Glitching image")
-    val glitcher = new Cuttr(image)
 
-    val glitchedImage = glitchType match {
-      case "smear" => glitcher.smear()
-      case "cubist" => glitcher.cubist()
-      case _ => glitcher.smear()
-    }
+    val glitchedImage = Cuttr(image, glitchType)
 
     val baos = new ByteArrayOutputStream()
     ImageIO.write(glitchedImage, "jpg", baos)

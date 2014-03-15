@@ -2,36 +2,24 @@ package com.rumblesan.scalaglitch
 
 import glitches._
 
-import javax.imageio.ImageIO
-
-import java.awt.Color
 import java.awt.image.BufferedImage
 
-import RichBufferedImage._
-import CoordWrapper.wrapCoords
-import RichColor._
 
-import scala.util.Random
-import math._
+object Cuttr {
 
-import Numeric._
-
-
-class Cuttr(image:BufferedImage) {
-
-  val cuttrrand = new Random()
-
-  def glitch(): BufferedImage = {
-    cubist()
+  def apply(image: BufferedImage, glitchType: String): BufferedImage = {
+    glitchType match {
+      case "smear" => smear(image)
+      case "cubist" => smear(image)
+      case _ => smear(image)
+    }
   }
 
+  def smear(image: BufferedImage): BufferedImage = Smear(image)
 
-  def smear(): BufferedImage = Smear(image)
+  def pusher(image: BufferedImage): List[BufferedImage] = Pusher(image)
 
-  def pusher(): List[BufferedImage] = Pusher(image)
-
-  def cubist(): BufferedImage = Cubist(image)
-
+  def cubist(image: BufferedImage): BufferedImage = Cubist(image)
 
 }
 
