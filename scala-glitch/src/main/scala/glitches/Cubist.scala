@@ -6,7 +6,7 @@ import scala.util.Random
 import math.cos
 
 import com.rumblesan.scalaglitch.util.RichBufferedImage._
-import com.rumblesan.scalaglitch.CoordWrapper.wrapCoords
+import com.rumblesan.scalaglitch.util.CoordWrapper.wrapCoords
 import com.rumblesan.scalaglitch.util.RichColor._
 
 import java.awt.image.BufferedImage

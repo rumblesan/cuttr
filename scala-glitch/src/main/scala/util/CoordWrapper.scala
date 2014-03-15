@@ -1,4 +1,4 @@
-package com.rumblesan.scalaglitch
+package com.rumblesan.scalaglitch.util
 
 object CoordWrapper {
 
