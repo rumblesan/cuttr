@@ -15,17 +15,18 @@ object Cubist {
 
   type PixelShifter = Pair[Int, Int] => Pair[Int, Int]
 
-  def apply(image: BufferedImage): BufferedImage = {
+  def apply(image: BufferedImage): BufferedImage = image.createGlitch(runCubist)
+
+  lazy val runCubist: BufferedImage => BufferedImage = image => {
 
     val randState = new Random()
     val (width, height) = image.getSize()
 
-    // Really we should have a way to pass the state through each of
-    // these one after the other. As it is, this is depending on the
-    // global state of the Random object still
-    val shifters: Seq[PixelShifter] = (1 to 30).map(
-      v => createPixelTransform(width, height).eval(randState)
-    )
+    // traverseS allows us to thread the state through all the
+    // state monads in the list
+    val shifters: List[PixelShifter] = (1 to 30).toList.traverseS(
+      v => createPixelTransform(width, height)
+    ).eval(randState)
 
     for (x <- 0 until width) {
       for (y <- 0 until height) {
