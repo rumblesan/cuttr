@@ -1,5 +1,7 @@
 package com.rumblesan.scalaglitch.glitches
 
+import scalaz._, Scalaz._
+
 import scala.util.Random
 import math.cos
 
@@ -11,22 +13,17 @@ import java.awt.image.BufferedImage
 
 object Smear {
 
-  def apply(image: BufferedImage): BufferedImage = {
-    val rand = new Random()
+  type PixelShifter = Pair[Int, Int] => Pair[Int, Int]
 
-    val randXShift = rand.nextDouble() * 100
-    val randYShift = rand.nextDouble() * 100
+  def apply(image: BufferedImage): BufferedImage = image.createGlitch(runSmear)
+
+  val runSmear: BufferedImage => BufferedImage = image => {
+
+    val randState = new Random()
 
     val (width, height) = image.getSize()
 
-    val shiftXFunc = (pos:Int) => {
-      (randXShift + pos + (100 * cos(pos))).toInt
-    }
-    val shiftYFunc = (pos:Int) => {
-      (randYShift + pos + (10 * cos(pos))).toInt
-    }
-
-    val shifter = wrapCoords(width-1, height-1, shiftXFunc, shiftYFunc)
+    val shifter = shifterGenerator(width)(height).eval(randState)
 
     for (x <- 0 until width) {
       for (y <- 0 until height) {
@@ -49,6 +46,23 @@ object Smear {
     }
 
     image
+  }
+
+  val shifterGenerator: Int => Int => State[Random, PixelShifter] = width => height => for {
+    randXShift <- createShift(100)
+    randYShift <- createShift(100)
+    xShifter = createShifter(randXShift)(100)
+    yShifter = createShifter(randYShift)(10)
+  } yield wrapCoords(width - 1, height - 1, xShifter, yShifter)
+
+  val createShift: Int => State[Random, Int] = shiftMultiplier => State[Random, Int] { rand =>
+    (rand, (rand.nextDouble() * shiftMultiplier).toInt)
+  }
+
+  val createShifter: Int => Int => (Int => Int) = randShift => multiplier => {
+    (pos) => {
+      (randShift + pos + (multiplier * cos(pos))).toInt
+    }
   }
 
 }
