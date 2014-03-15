@@ -21,6 +21,7 @@ object ScalaGlitch extends Build {
   lazy val tumblrapi = "com.rumblesan.util" %% "tumblrapi" % "0.2.0"
   lazy val argonaut = "io.argonaut" %% "argonaut" % "6.0-RC1"  
   lazy val config = "com.typesafe" % "config" % "1.0.1"
+  lazy val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
 
   lazy val defaultSettings = Defaults.defaultSettings ++ buildSettings ++ Seq(
     libraryDependencies += specs,
@@ -44,7 +45,9 @@ object ScalaGlitch extends Build {
   lazy val scalaglitch = Project(
     id = "scalaglitch",
     base = file("scala-glitch"),
-    settings = defaultSettings
+    settings = defaultSettings ++ Seq(
+      libraryDependencies += scalaz
+    )
   ).settings(
     scalacOptions ++= Seq("-feature", "-language:_", "-deprecation")
   )
