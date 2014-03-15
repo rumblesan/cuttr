@@ -59,6 +59,10 @@ case class RichBufferedImage(image:BufferedImage) {
                       null)
   }
 
+  def createGlitch(glitchFunction: BufferedImage => BufferedImage): BufferedImage = {
+    glitchFunction(image.deepClone())
+  }
+
 }
 
 object RichBufferedImage {
