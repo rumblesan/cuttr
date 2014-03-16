@@ -13,7 +13,7 @@ object Glitchr extends GlitchTypes {
   def apply(image: BufferedImage, glitchType: String): Array[Byte] = {
     val glitchedImage: GlitchedImage = glitchType match {
       case "smear" => smear(image)
-      case "cubist" => smear(image)
+      case "cubist" => cubist(image)
       case _ => smear(image)
     }
     FileOps.glitchedImageToByteArray(glitchedImage)
