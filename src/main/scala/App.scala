@@ -31,7 +31,7 @@ object App {
 
     println("Updating %s with photos from tag %s".format(config.blogUrl, config.searchTag))
 
-    for {
+    val exitcode = for {
       tumblrPhotos <- Tumblr.getTaggedPhotos(config.tumblrApi, config.searchTag)
       _ = println(s"Retrieved ${tumblrPhotos.length} photos")
       originalImages = getOriginalImages(tumblrPhotos)
@@ -41,9 +41,12 @@ object App {
       photoData <- glitchImage(photo, config.glitchType)
       jsondata <- postToTumblr(config, photoData, photo.caption)
       response <- jsondata.decodeOption[TumblrResponse[PostId]]
-      _ = checkResponse(response, config.blogUrl)
-    } yield response
+      exitcode <- checkResponse(response, config.blogUrl)
+    } yield exitcode
 
+    System.exit(
+      exitcode.getOrElse(1)
+    )
   }
 
   def getOriginalImages(photoposts: List[PhotoPost]): List[CuttrPhoto] = {
@@ -79,14 +82,16 @@ object App {
     )
   }
 
-  def checkResponse(response: TumblrResponse[PostId], url: String): Unit = {
+  def checkResponse(response: TumblrResponse[PostId], url: String): Option[Int] = {
     response.meta match {
       case Meta(201, msg) => {
         println("Post url:\n    http://%s/post/%d".format(url, response.response.id))
+        Some(0)
       }
       case Meta(status, msg) => {
         println("Status code %d was returned when creating post".format(status))
         println("    %s".format(msg))
+        None
       }
     }
   }
