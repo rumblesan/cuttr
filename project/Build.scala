@@ -49,6 +49,8 @@ object ScalaGlitch extends Build {
       target in assembly := file("./assembled")
     ) ++ mergingStrategy
 
+  ).settings(
+    scalacOptions ++= Seq("-feature", "-language:_", "-deprecation")
   ) dependsOn(scalaglitch)
 
   lazy val scalaglitch = Project(
