@@ -34,7 +34,7 @@ object App {
     val exitcode = for {
       tumblrPhotos <- Tumblr.getTaggedPhotos(config.tumblrApi, config.searchTag)
       _ = println(s"Retrieved ${tumblrPhotos.length} photos")
-      originalImages = getOriginalImages(tumblrPhotos)
+      originalImages <- getOriginalImages(tumblrPhotos)
       photo <- Random.shuffle(originalImages).headOption
       _ = println(s"Chosen image at ${photo.imgUrl}")
       _ = println("Glitching and then sending to Tumblr")
@@ -49,13 +49,15 @@ object App {
     )
   }
 
-  def getOriginalImages(photoposts: List[PhotoPost]): List[CuttrPhoto] = {
-    for {
-      post <- photoposts
-      photos = post.photos
-      photo <- photos
-      original = photo.original_size
-    } yield CuttrPhoto(original.url, post.blog_name, post.post_url, post.date)
+  def getOriginalImages(photoposts: List[PhotoPost]): Option[List[CuttrPhoto]] = {
+    Some(
+      for {
+        post <- photoposts
+        photos = post.photos
+        photo <- photos
+        original = photo.original_size
+      } yield CuttrPhoto(original.url, post.blog_name, post.post_url, post.date)
+    )
   }
 
   def glitchImage(photo: CuttrPhoto, glitch: String): Option[Array[Byte]] = {
