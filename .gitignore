@@ -1,4 +1,5 @@
 target/
 *.jpeg
 assembled/
+*.pyc
 
