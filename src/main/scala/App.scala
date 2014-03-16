@@ -8,6 +8,8 @@ import com.rumblesan.scalaglitch.Glitchr
 
 import com.rumblesan.util.tumblrapi.TumblrAPI
 
+import com.rumblesan.cuttr.util.CuttrConfig
+
 import scala.io.Source
 
 import scala.util.Random
@@ -24,38 +26,27 @@ import com.rumblesan.cuttr.models._
 
 object App {
 
-  lazy val config = ConfigFactory.load()
-
-  lazy val tumblrApi = new TumblrAPI(
-    config.getString("cuttr.oauth.apiKey"),
-    config.getString("cuttr.oauth.apiSecret"),
-    config.getString("cuttr.oauth.oauthToken"),
-    config.getString("cuttr.oauth.oauthSecret")
+  lazy val config = CuttrConfig.create(
+    ConfigFactory.load()
   )
-
-  lazy val blogUrl = config.getString("cuttr.blog.url")
-
-  lazy val tag = config.getString("cuttr.search.tag")
-
-  lazy val glitchType = config.getString("cuttr.glitch.type")
 
   def main(args: Array[String]) {
 
     println("###########\n#  Cuttr  #\n###########")
 
-    println("Updating %s with photos from tag %s".format(blogUrl, tag))
+    println("Updating %s with photos from tag %s".format(config.blogUrl, config.searchTag))
 
     for {
-      tumblrPhotos <- Tumblr.getTaggedPhotos(tumblrApi, tag)
+      tumblrPhotos <- Tumblr.getTaggedPhotos(config.tumblrApi, config.searchTag)
       _ = println(s"Retrieved ${tumblrPhotos.length} photos")
       originalImages = getOriginalImages(tumblrPhotos)
       photo <- Random.shuffle(originalImages).headOption
       _ = println(s"Chosen image at ${photo.imgUrl}")
       _ = println("Glitching and then sending to Tumblr")
-      photoData = glitchImage(photo, glitchType)
-      jsondata <- postToTumblr(photoData, photo.caption, blogUrl, tag)
+      photoData = glitchImage(photo, config.glitchType)
+      jsondata <- postToTumblr(config, photoData, photo.caption)
       response <- jsondata.decodeOption[TumblrResponse[PostId]]
-      _ = checkResponse(response, blogUrl)
+      _ = checkResponse(response, config.blogUrl)
     } yield response
 
   }
@@ -78,14 +69,14 @@ object App {
     )
   }
 
-  def postToTumblr(photoData: Array[Byte], photoCaption: String, blog: String, searchTag: String): Option[String] = {
-    tumblrApi.post(
+  def postToTumblr(config: CuttrConfig, photoData: Array[Byte], photoCaption: String): Option[String] = {
+    config.tumblrApi.post(
       "post",
-      blog,
+      config.blogUrl,
       Map(
         "type" -> "photo",
         "caption" -> photoCaption,
-        "tags" -> "Cuttr, glitch, generative, random, %s".format(searchTag)
+        "tags" -> "Cuttr, glitch, generative, random, %s".format(config.searchTag)
       ),
       photoData
     )
