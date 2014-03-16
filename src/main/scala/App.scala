@@ -18,6 +18,8 @@ import argonaut._, Argonaut._
 import Json.JsonArray
 
 import com.rumblesan.cuttr.tumblr._
+import com.rumblesan.cuttr.models._
+
 
 
 object App {
@@ -65,13 +67,13 @@ object App {
 
   }
 
-  def postToTumblr(glitchedPhoto: Photo, blog: String, searchTag: String, glitch: String): Option[String] = {
+  def postToTumblr(glitchedPhoto: CuttrPhoto, blog: String, searchTag: String, glitch: String): Option[String] = {
     tumblrApi.post(
       "post",
       blog,
       Map(
         "type" -> "photo",
-        "caption" -> createPostCaption(glitchedPhoto),
+        "caption" -> glitchedPhoto.caption,
         "tags" -> "Cuttr, glitch, generative, random, %s".format(searchTag)
       ),
       glitchImage(glitchedPhoto, glitch)
@@ -90,7 +92,7 @@ object App {
     }
   }
 
-  def glitchImage(photo: Photo, glitch: String): Array[Byte] = {
+  def glitchImage(photo: CuttrPhoto, glitch: String): Array[Byte] = {
 
     println("Glitching image")
 
@@ -103,23 +105,13 @@ object App {
 
   }
 
-  case class Photo(imgUrl: String, blogName: String, postUrl: String, postDate: String)
-
-  def getOriginalImages(photoposts: List[PhotoPost]): List[Photo] = {
+  def getOriginalImages(photoposts: List[PhotoPost]): List[CuttrPhoto] = {
     for {
       post <- photoposts
       photos = post.photos
       photo <- photos
       original = photo.original_size
-    } yield Photo(original.url, post.blog_name, post.post_url, post.date)
-  }
-
-
-  def createPostCaption(photo: Photo) = {
-    """
-      <a href='${photo.imgUrl}'>Original</a> image courtesy of ${photo.blogName}
-      <a href='${photo.postUrl}'>First posted</a> on ${photo.postDate}
-    """
+    } yield CuttrPhoto(original.url, post.blog_name, post.post_url, post.date)
   }
 
 }
