@@ -38,7 +38,7 @@ object App {
       photo <- Random.shuffle(originalImages).headOption
       _ = println(s"Chosen image at ${photo.imgUrl}")
       _ = println("Glitching and then sending to Tumblr")
-      photoData = glitchImage(photo, config.glitchType)
+      photoData <- glitchImage(photo, config.glitchType)
       jsondata <- postToTumblr(config, photoData, photo.caption)
       response <- jsondata.decodeOption[TumblrResponse[PostId]]
       _ = checkResponse(response, config.blogUrl)
@@ -55,12 +55,14 @@ object App {
     } yield CuttrPhoto(original.url, post.blog_name, post.post_url, post.date)
   }
 
-  def glitchImage(photo: CuttrPhoto, glitch: String): Array[Byte] = {
-    Glitchr(
-      ImageIO.read(
-        new URL(photo.imgUrl)
-      ),
-      glitch
+  def glitchImage(photo: CuttrPhoto, glitch: String): Option[Array[Byte]] = {
+    Some(
+      Glitchr(
+        ImageIO.read(
+          new URL(photo.imgUrl)
+        ),
+        glitch
+      )
     )
   }
 
