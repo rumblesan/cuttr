@@ -127,21 +127,13 @@ object App {
     } yield Photo(original.url, post.blog_name, post.post_url, post.date)
   }
 
-  val descText = """
-                   <a href='%s'>Original</a> image courtesy of %s
-                   <a href='%s'>First posted</a> on %s
-                 """
 
   def createPostCaption(photo: Photo) = {
-    descText.format(
-      photo.imgUrl,
-      photo.blogName,
-      photo.postUrl,
-      photo.postDate
-    )
+    """
+      <a href='${photo.imgUrl}'>Original</a> image courtesy of ${photo.blogName}
+      <a href='${photo.postUrl}'>First posted</a> on ${photo.postDate}
+    """
   }
-
-
 
 }
 
