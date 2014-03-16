@@ -1,27 +1,22 @@
 package com.rumblesan.cuttr
 
-import javax.imageio.ImageIO
-import java.io.{File, IOException}
-import java.net.URL
-
-import com.rumblesan.scalaglitch.Glitchr
-
-import com.rumblesan.util.tumblrapi.TumblrAPI
-
-import com.rumblesan.cuttr.util.CuttrConfig
-
 import scala.io.Source
-
 import scala.util.Random
 
-import com.typesafe.config._
+import com.rumblesan.cuttr.util.CuttrConfig
+import com.rumblesan.cuttr.tumblr._
+import com.rumblesan.cuttr.models._
+import com.rumblesan.scalaglitch.Glitchr
+import com.rumblesan.util.tumblrapi.TumblrAPI
+
+import com.typesafe.config.ConfigFactory
 
 import argonaut._, Argonaut._
 import Json.JsonArray
 
-import com.rumblesan.cuttr.tumblr._
-import com.rumblesan.cuttr.models._
-
+import javax.imageio.ImageIO
+import java.io.{File, IOException}
+import java.net.URL
 
 
 object App {
