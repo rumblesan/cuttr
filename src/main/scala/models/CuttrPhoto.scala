@@ -4,8 +4,10 @@ case class CuttrPhoto(imgUrl: String, blogName: String, postUrl: String, postDat
 
 trait CuttrPhotoOps {
 
+  def self:CuttrPhoto
+
   def caption: String = {
-    """
+    s"""
       <a href='${self.imgUrl}'>Original</a> image courtesy of ${self.blogName}
       <a href='${self.postUrl}'>First posted</a> on ${self.postDate}
     """
