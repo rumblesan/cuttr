@@ -15,6 +15,15 @@ object ScalaGlitch extends Build {
 
   )
 
+  lazy val mergingStrategy = Seq(
+    mergeStrategy in assembly <<= (mergeStrategy in assembly) (
+      (old) => {
+        case "application.conf" => MergeStrategy.concat
+        case x => old(x)
+      }
+    )
+  )
+
   // Dependencies.
   lazy val specs = "org.specs2" %% "specs2" % "1.14" % "test"
   lazy val mockito = "org.mockito" % "mockito-core" % "1.8.5" % "test"
@@ -38,7 +47,7 @@ object ScalaGlitch extends Build {
       libraryDependencies += argonaut,
       jarName in assembly := "cuttr.jar",
       target in assembly := file("./assembled")
-    )
+    ) ++ mergingStrategy
 
   ) dependsOn(scalaglitch)
 
