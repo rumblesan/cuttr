@@ -52,23 +52,24 @@ object App {
       photo <- Random.shuffle(originalImages).headOption
       _ = println(s"Chosen image at ${photo.imgUrl}")
       _ = println("Glitching and then sending to Tumblr")
-      jsondata <- postToTumblr(photo, blogUrl, tag, glitchType)
+      photoData = glitchImage(photo, glitchType)
+      jsondata <- postToTumblr(photoData, photo.caption, blogUrl, tag)
       response <- jsondata.decodeOption[TumblrResponse[PostId]]
       _ = checkResponse(response, blogUrl)
     } yield response
 
   }
 
-  def postToTumblr(glitchedPhoto: CuttrPhoto, blog: String, searchTag: String, glitch: String): Option[String] = {
+  def postToTumblr(photoData: Array[Byte], photoCaption: String, blog: String, searchTag: String): Option[String] = {
     tumblrApi.post(
       "post",
       blog,
       Map(
         "type" -> "photo",
-        "caption" -> glitchedPhoto.caption,
+        "caption" -> photoCaption,
         "tags" -> "Cuttr, glitch, generative, random, %s".format(searchTag)
       ),
-      glitchImage(glitchedPhoto, glitch)
+      photoData
     )
   }
 
