@@ -45,25 +45,17 @@ object App {
 
     println("Updating %s with photos from tag %s".format(blogUrl, tag))
 
-    Tumblr.getTaggedPhotos(tumblrApi, tag).map(getOriginalImages).map(photos => {
-
-      println("Retrieved %d photos".format(photos.length))
-
-      Random.shuffle(photos).headOption.map(photo => {
-
-        println("Chose image at %s".format(photo.imgUrl))
-
-        println("Glitching and then sending to Tumblr")
-
-        for {
-          jsondata <- postToTumblr(photo, blogUrl, tag, glitchType)
-          response <- jsondata.decodeOption[TumblrResponse[PostId]]
-          _ = checkResponse(response, blogUrl)
-        } yield response
-
-      })
-
-    })
+    for {
+      tumblrPhotos <- Tumblr.getTaggedPhotos(tumblrApi, tag)
+      _ = println(s"Retrieved ${tumblrPhotos.length} photos")
+      originalImages = getOriginalImages(tumblrPhotos)
+      photo <- Random.shuffle(originalImages).headOption
+      _ = println(s"Chosen image at ${photo.imgUrl}")
+      _ = println("Glitching and then sending to Tumblr")
+      jsondata <- postToTumblr(photo, blogUrl, tag, glitchType)
+      response <- jsondata.decodeOption[TumblrResponse[PostId]]
+      _ = checkResponse(response, blogUrl)
+    } yield response
 
   }
 
