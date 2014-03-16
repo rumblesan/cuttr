@@ -60,6 +60,24 @@ object App {
 
   }
 
+  def getOriginalImages(photoposts: List[PhotoPost]): List[CuttrPhoto] = {
+    for {
+      post <- photoposts
+      photos = post.photos
+      photo <- photos
+      original = photo.original_size
+    } yield CuttrPhoto(original.url, post.blog_name, post.post_url, post.date)
+  }
+
+  def glitchImage(photo: CuttrPhoto, glitch: String): Array[Byte] = {
+    Glitchr(
+      ImageIO.read(
+        new URL(photo.imgUrl)
+      ),
+      glitch
+    )
+  }
+
   def postToTumblr(photoData: Array[Byte], photoCaption: String, blog: String, searchTag: String): Option[String] = {
     tumblrApi.post(
       "post",
@@ -83,28 +101,6 @@ object App {
         println("    %s".format(msg))
       }
     }
-  }
-
-  def glitchImage(photo: CuttrPhoto, glitch: String): Array[Byte] = {
-
-    println("Glitching image")
-
-    Glitchr(
-      ImageIO.read(
-        new URL(photo.imgUrl)
-      ),
-      glitch
-    )
-
-  }
-
-  def getOriginalImages(photoposts: List[PhotoPost]): List[CuttrPhoto] = {
-    for {
-      post <- photoposts
-      photos = post.photos
-      photo <- photos
-      original = photo.original_size
-    } yield CuttrPhoto(original.url, post.blog_name, post.post_url, post.date)
   }
 
 }
