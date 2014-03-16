@@ -2,6 +2,36 @@ package com.rumblesan.cuttr.tumblr
 
 import argonaut._, Argonaut._
 
+import com.rumblesan.util.tumblrapi.TumblrAPI
+
+
+object Tumblr {
+
+  def getTaggedPhotos(tumblr:TumblrAPI, tag: String): Option[List[PhotoPost]] = {
+    for {
+      stringdata <- tumblr.get("tagged", "", Map("tag" -> tag))
+      jsondata <- stringdata.parseOption
+      cursor = jsondata.cursor
+      posts <- cursor.downField("response")
+      postArray <- posts.focus.array
+      filtered = filterPostType(postArray, "photo")
+      output <- jArray(filtered).jdecode[List[PhotoPost]].toOption
+    } yield output
+
+  }
+
+  def filterPostType(posts: JsonArray, `type`: String): JsonArray = {
+    for {
+      element <- posts
+      typeField <- element.field("type")
+      typeVal <- typeField.string
+      if typeVal == `type`
+    } yield element
+  }
+
+}
+
+
 case class TumblrResponse[T](meta: Meta, response: T)
 
 object TumblrResponse {

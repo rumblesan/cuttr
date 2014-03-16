@@ -43,7 +43,7 @@ object App {
 
     println("Updating %s with photos from tag %s".format(blogUrl, tag))
 
-    getTaggedPhotos(tumblrApi, tag).map(getOriginalImages).map(photos => {
+    Tumblr.getTaggedPhotos(tumblrApi, tag).map(getOriginalImages).map(photos => {
 
       println("Retrieved %d photos".format(photos.length))
 
@@ -53,32 +53,41 @@ object App {
 
         println("Glitching and then sending to Tumblr")
 
-        (for {
-          jsondata <- tumblrApi.post(
-            "post",
-            blogUrl,
-            Map("type" -> "photo",
-                "caption" -> createPostCaption(photo),
-                "tags" -> "Cuttr, glitch, generative, random, %s".format(tag)),
-            glitchImage(photo, glitchType)
-          )
+        for {
+          jsondata <- postToTumblr(photo, blogUrl, tag, glitchType)
           response <- jsondata.decodeOption[TumblrResponse[PostId]]
-        } yield response).map(response =>
-          response.meta match {
-            case Meta(201, msg) => {
-              println("Post url:\n    http://%s/post/%d".format(blogUrl, response.response.id))
-            }
-            case Meta(status, msg) => {
-              println("Status code %d was returned when creating post".format(status))
-              println("    %s".format(msg))
-            }
-          }
-        )
+          _ = checkResponse(response, blogUrl)
+        } yield response
 
       })
 
     })
 
+  }
+
+  def postToTumblr(glitchedPhoto: Photo, blog: String, searchTag: String, glitch: String): Option[String] = {
+    tumblrApi.post(
+      "post",
+      blog,
+      Map(
+        "type" -> "photo",
+        "caption" -> createPostCaption(glitchedPhoto),
+        "tags" -> "Cuttr, glitch, generative, random, %s".format(searchTag)
+      ),
+      glitchImage(glitchedPhoto, glitch)
+    )
+  }
+
+  def checkResponse(response: TumblrResponse[PostId], url: String): Unit = {
+    response.meta match {
+      case Meta(201, msg) => {
+        println("Post url:\n    http://%s/post/%d".format(url, response.response.id))
+      }
+      case Meta(status, msg) => {
+        println("Status code %d was returned when creating post".format(status))
+        println("    %s".format(msg))
+      }
+    }
   }
 
   def glitchImage(photo: Photo, glitch: String): Array[Byte] = {
@@ -92,28 +101,6 @@ object App {
       glitch
     )
 
-  }
-
-  def getTaggedPhotos(tumblr:TumblrAPI, tag: String): Option[List[PhotoPost]] = {
-    for {
-      stringdata <- tumblr.get("tagged", "", Map("tag" -> tag))
-      jsondata <- stringdata.parseOption
-      cursor = jsondata.cursor
-      posts <- cursor.downField("response")
-      postArray <- posts.focus.array
-      filtered = filterPostType(postArray, "photo")
-      output <- jArray(filtered).jdecode[List[PhotoPost]].toOption
-    } yield output
-
-  }
-
-  def filterPostType(posts: JsonArray, `type`: String): JsonArray = {
-    for {
-      element <- posts
-      typeField <- element.field("type")
-      typeVal <- typeField.string
-      if typeVal == `type`
-    } yield element
   }
 
   case class Photo(imgUrl: String, blogName: String, postUrl: String, postDate: String)
