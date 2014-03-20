@@ -7,6 +7,7 @@ import com.rumblesan.cuttr.util.CuttrConfig
 import com.rumblesan.cuttr.tumblr._
 import com.rumblesan.cuttr.models._
 import com.rumblesan.scalaglitch.Glitchr
+import com.rumblesan.scalaglitch.types.ImageCanvas
 import com.rumblesan.util.tumblrapi.TumblrAPI
 
 import com.typesafe.config.ConfigFactory
@@ -61,14 +62,14 @@ object App {
   }
 
   def glitchImage(photo: CuttrPhoto, glitch: String): Option[Array[Byte]] = {
-    Some(
-      Glitchr(
-        ImageIO.read(
-          new URL(photo.imgUrl)
-        ),
-        glitch
-      )
+    val source = ImageCanvas(
+      ImageIO.read(
+        new URL(photo.imgUrl)
+      ),
+      glitch
     )
+
+    Some(Glitchr(source))
   }
 
   def postToTumblr(config: CuttrConfig, photoData: Array[Byte], photoCaption: String): Option[String] = {

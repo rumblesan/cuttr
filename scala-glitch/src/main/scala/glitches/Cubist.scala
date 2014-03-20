@@ -9,8 +9,7 @@ import com.rumblesan.scalaglitch.util.RichBufferedImage._
 import com.rumblesan.scalaglitch.util.CoordWrapper.wrapCoords
 import com.rumblesan.scalaglitch.util.RichColor._
 
-import com.rumblesan.scalaglitch.types.GlitchTypes
-import com.rumblesan.scalaglitch.types.GlitchedImages._
+import com.rumblesan.scalaglitch.types._
 
 import java.awt.image.BufferedImage
 

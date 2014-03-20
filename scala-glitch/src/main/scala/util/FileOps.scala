@@ -1,6 +1,6 @@
 package com.rumblesan.scalaglitch.util
 
-import com.rumblesan.scalaglitch.types.GlitchedImages._
+import com.rumblesan.scalaglitch.types._
 
 import java.awt.image.BufferedImage
 

@@ -8,10 +8,10 @@ trait GlitchTypes {
 
 }
 
-object GlitchedImages {
 
-  sealed trait GlitchedImage
-  case class GlitchedJpeg(image: BufferedImage) extends GlitchedImage
+sealed trait GlitchedImage
+case class GlitchedJpeg(image: BufferedImage) extends GlitchedImage
 
-}
+sealed trait GlitchSource
+case class ImageCanvas(image: BufferedImage, glitchType: String) extends GlitchSource
 
