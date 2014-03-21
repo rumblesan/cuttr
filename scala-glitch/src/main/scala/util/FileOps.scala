@@ -14,6 +14,7 @@ object FileOps {
   def glitchedImageToByteArray(image: GlitchedImage): Array[Byte] = {
     image match {
       case GlitchedJpeg(jpeg) => glitchedJpegToByteArray(jpeg)
+      case GlitchedGif(frames) => glitchedGifToByteArray(frames)
     }
   }
 
@@ -26,6 +27,7 @@ object FileOps {
     imageData
   }
 
+  def glitchedGifToByteArray(gifFrames: List[BufferedImage]): Array[Byte] = GifWriter(gifFrames, true, 33).get
 
 }
 

@@ -22,13 +22,14 @@ object Glitchr extends GlitchTypes {
     glitchType match {
       case "smear" => smear(image)
       case "cubist" => cubist(image)
+      case "pusher" => pusher(image)
       case _ => smear(image)
     }
   }
 
   def smear(image: BufferedImage): GlitchedImage = Smear(image)
 
-  def pusher(image: BufferedImage): List[BufferedImage] = Pusher(image)
+  def pusher(image: BufferedImage): GlitchedImage = Pusher(image)
 
   def cubist(image: BufferedImage): GlitchedImage = Cubist(image)
 

@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage
 
 object Pusher extends GlitchTypes {
 
-  def apply(image: BufferedImage): List[BufferedImage] = {
+  def apply(image: BufferedImage): GlitchedGif = {
  
     val rand = new Random()
 
@@ -35,7 +35,7 @@ object Pusher extends GlitchTypes {
       } yield image.createGlitch(runPusher)
     } yield images
 
-    genGlitches.eval(rand).toList
+    GlitchedGif(genGlitches.eval(rand).toList)
 
   }
 
