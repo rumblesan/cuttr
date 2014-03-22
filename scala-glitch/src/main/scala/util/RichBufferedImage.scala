@@ -1,5 +1,6 @@
 package com.rumblesan.scalaglitch.util
 
+import java.awt.{Image, Graphics}
 import java.awt.image.{BufferedImage, ColorModel, WritableRaster}
 import java.awt.Color
 
@@ -50,6 +51,19 @@ case class RichBufferedImage(image:BufferedImage) {
     val width  = image.getWidth()
     val height = image.getHeight()
     (width, height)
+  }
+
+  def setMaxHeight(maxHeight: Int): BufferedImage = {
+    val (fullWidth, fullHeight) = image.getSize()
+    val newHeight = maxHeight
+    val newWidth = ((newHeight.toDouble / fullHeight) * fullWidth).toInt
+    val newImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH)
+
+    val bImage = new BufferedImage(newImage.getWidth(null), newImage.getHeight(null), BufferedImage.TYPE_INT_ARGB)
+    val bgr = bImage.createGraphics()
+    bgr.drawImage(newImage, 0, 0, null)
+    bgr.dispose()
+    bImage
   }
 
   def deepClone():BufferedImage = {
