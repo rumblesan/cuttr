@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage
 
 object Glitchr extends GlitchTypes {
 
-  def apply(image: GlitchSource): Array[Byte] = {
+  def apply(image: GlitchSource): GlitchedImageData = {
 
     val glitchedImage: GlitchedImage = image match {
       case ImageCanvas(source, glitchType) => canvasGlitch(source, glitchType)

@@ -11,23 +11,23 @@ import java.io.{File, IOException}
 
 object FileOps {
 
-  def glitchedImageToByteArray(image: GlitchedImage): Array[Byte] = {
+  def glitchedImageToByteArray(image: GlitchedImage): GlitchedImageData = {
     image match {
       case GlitchedJpeg(jpeg) => glitchedJpegToByteArray(jpeg)
       case GlitchedGif(frames) => glitchedGifToByteArray(frames)
     }
   }
 
-  def glitchedJpegToByteArray(jpeg: BufferedImage): Array[Byte] = {
+  def glitchedJpegToByteArray(jpeg: BufferedImage): GlitchedImageData = {
     val baos = new ByteArrayOutputStream()
     ImageIO.write(jpeg, "jpg", baos)
     baos.flush()
     val imageData = baos.toByteArray()
     baos.close()
-    imageData
+    GlitchedImageData(imageData, "jpeg")
   }
 
-  def glitchedGifToByteArray(gifFrames: List[BufferedImage]): Array[Byte] = {
+  def glitchedGifToByteArray(gifFrames: List[BufferedImage]): GlitchedImageData = {
 
     val baos = new ByteArrayOutputStream()
     val gifEncoder = new AnimatedGifEncoder()
@@ -45,6 +45,7 @@ object FileOps {
 
     val imageData = baos.toByteArray()
     baos.close()
+    GlitchedImageData(imageData, "gif")
 
     imageData
 

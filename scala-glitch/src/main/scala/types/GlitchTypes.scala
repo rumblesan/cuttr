@@ -16,3 +16,4 @@ case class GlitchedGif(images: List[BufferedImage]) extends GlitchedImage
 sealed trait GlitchSource
 case class ImageCanvas(image: BufferedImage, glitchType: String) extends GlitchSource
 
+case class GlitchedImageData(data: Array[Byte], extension: String)

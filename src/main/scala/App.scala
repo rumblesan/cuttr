@@ -7,7 +7,7 @@ import com.rumblesan.cuttr.util.CuttrConfig
 import com.rumblesan.cuttr.tumblr._
 import com.rumblesan.cuttr.models._
 import com.rumblesan.scalaglitch.Glitchr
-import com.rumblesan.scalaglitch.types.ImageCanvas
+import com.rumblesan.scalaglitch.types.{ImageCanvas, GlitchedImageData}
 import com.rumblesan.util.tumblrapi.TumblrAPI
 
 import com.typesafe.config.ConfigFactory
@@ -61,7 +61,7 @@ object App {
     )
   }
 
-  def glitchImage(photo: CuttrPhoto, glitch: String): Option[Array[Byte]] = {
+  def glitchImage(photo: CuttrPhoto, glitch: String): Option[GlitchedImageData] = {
     val source = ImageCanvas(
       ImageIO.read(
         new URL(photo.imgUrl)
@@ -72,7 +72,7 @@ object App {
     Some(Glitchr(source))
   }
 
-  def postToTumblr(config: CuttrConfig, photoData: Array[Byte], photoCaption: String): Option[String] = {
+  def postToTumblr(config: CuttrConfig, photoData: GlitchedImageData, photoCaption: String): Option[String] = {
     config.tumblrApi.post(
       "post",
       config.blogUrl,
@@ -81,7 +81,8 @@ object App {
         "caption" -> photoCaption,
         "tags" -> "Cuttr, glitch, generative, random, %s".format(config.searchTag)
       ),
-      photoData
+      photoData.data,
+      photoData.extension
     )
   }
 
