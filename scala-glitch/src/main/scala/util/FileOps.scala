@@ -5,7 +5,7 @@ import com.rumblesan.scalaglitch.types._
 import java.awt.image.BufferedImage
 
 import javax.imageio.ImageIO
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayOutputStream, FileOutputStream, BufferedOutputStream}
 import java.io.{File, IOException}
 
 
@@ -50,6 +50,15 @@ object FileOps {
     baos.close()
     GlitchedImageData(imageData, "gif")
 
+  }
+
+  def glitchedImageToFile(data: GlitchedImageData): Unit = {
+
+    val fos = new FileOutputStream(new File(s"test.${data.extension}"))
+    val bos = new BufferedOutputStream(fos)
+
+    bos.write(data.data);
+    bos.close()
 
   }
 
