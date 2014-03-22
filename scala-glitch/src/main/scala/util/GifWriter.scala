@@ -1,8 +1,8 @@
 package com.rumblesan.scalaglitch.util
 
-import java.io.ByteArrayOutputStream
+import java.io.{ ByteArrayOutputStream, FileOutputStream }
 
-import javax.imageio.stream.ImageOutputStream
+import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{IIOException, IIOImage, ImageIO, ImageTypeSpecifier, ImageWriter, ImageWriteParam}
 import javax.imageio.metadata.{IIOMetadata, IIOMetadataNode}
 
@@ -31,13 +31,14 @@ object GifWriter {
     timeBetweenFramesMS: Int): Array[Byte] = {
 
     val baos = new ByteArrayOutputStream()
+    val ios = new MemoryCacheImageOutputStream(baos)
     val gifWriter: ImageWriter = getWriter()
 
     val imageTypeSpecifier: ImageTypeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(imageType)
     val imageWriteParam: ImageWriteParam = gifWriter.getDefaultWriteParam()
     val imageMetaData = generateMetaData(gifWriter, imageWriteParam, imageTypeSpecifier, loopContinuously, timeBetweenFramesMS)
 
-    gifWriter.setOutput(baos)
+    gifWriter.setOutput(ios)
 
     gifWriter.prepareWriteSequence(null)
 
@@ -45,10 +46,15 @@ object GifWriter {
       writeToSequence(gifWriter, img, imageMetaData, imageWriteParam)
     }
 
+    ios.flush()
+    gifWriter.endWriteSequence()
 
-    baos.flush()
     val imageData = baos.toByteArray()
-    baos.close()
+    ios.close()
+
+    val outfile = new FileOutputStream("test.gif")
+    outfile.write(imageData)
+    outfile.close()
 
     imageData
   }
@@ -66,7 +72,7 @@ object GifWriter {
   def getNode(rootNode: IIOMetadataNode, nodeName: String): IIOMetadataNode = {
     val nNodes: Int = rootNode.getLength()
 
-    for (i <- 0 to nNodes) {
+    for (i <- 0 until nNodes) {
       if (rootNode.item(i).getNodeName().compareToIgnoreCase(nodeName) == 0) {
         return rootNode.item(i).asInstanceOf[IIOMetadataNode]
       }
