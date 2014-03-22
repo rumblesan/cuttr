@@ -33,7 +33,9 @@ object Pusher extends GlitchTypes {
         offset = sin(f * frameOffset) * multiplier
         shifter = shifterGen(offset)
         runPusher = pusherGenerator(shifter)
-      } yield image.createGlitch(runPusher)
+        gi = image.createGlitch(runPusher)
+        _ = println(s"glitched image $f of $frames")
+      } yield gi
     } yield images
 
     GlitchedGif(genGlitches.eval(rand).toList)
