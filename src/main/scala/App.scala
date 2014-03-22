@@ -30,6 +30,21 @@ object App {
 
     println("###########\n#  Cuttr  #\n###########")
 
+    args.toList match {
+
+      case "-f" :: inputFile :: outputFile :: Nil => glitchFile(inputFile, outputFile)
+      case _ => tumblrBot
+
+    }
+
+  }
+
+  def glitchFile(inFile: String, outFile: String) {
+    println("Nothing here yet")
+  }
+
+  def tumblrBot {
+
     println("Updating %s with photos from tag %s".format(config.blogUrl, config.searchTag))
 
     val exitcode = for {
@@ -48,6 +63,7 @@ object App {
     System.exit(
       exitcode.getOrElse(1)
     )
+
   }
 
   def getOriginalImages(photoposts: List[PhotoPost]): Option[List[CuttrPhoto]] = {
