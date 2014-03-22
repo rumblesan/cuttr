@@ -27,7 +27,28 @@ object FileOps {
     imageData
   }
 
-  def glitchedGifToByteArray(gifFrames: List[BufferedImage]): Array[Byte] = GifWriter(gifFrames, true, 33).get
+  def glitchedGifToByteArray(gifFrames: List[BufferedImage]): Array[Byte] = {
+
+    val baos = new ByteArrayOutputStream()
+    val gifEncoder = new AnimatedGifEncoder()
+    gifEncoder.start(baos)
+    gifEncoder.setRepeat(0)
+    gifEncoder.setFrameRate(30f)
+
+    var count = 1
+    for (img <- gifFrames) {
+      gifEncoder.addFrame(img)
+      println(s"written $count")
+      count += 1
+    }
+    gifEncoder.finish()
+
+    val imageData = baos.toByteArray()
+    baos.close()
+
+    imageData
+
+  }
 
 }
 
