@@ -16,8 +16,9 @@ import java.awt.image.BufferedImage
 
 object Pusher extends GlitchTypes {
 
-  def apply(image: BufferedImage): GlitchedGif = {
+  def apply(fullSizedImage: BufferedImage): GlitchedGif = {
  
+    val image = fullSizedImage.setMaxHeight(400)
     val rand = new Random()
 
     val (width, height) = image.getSize()
