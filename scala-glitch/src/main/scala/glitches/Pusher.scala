@@ -25,7 +25,7 @@ object Pusher extends GlitchTypes {
     val genGlitches = for {
       frames <- getFrameCount
       multiplier <- getFrameOffsetMultiplier
-      frameOffset = (Pi / frames).toInt
+      frameOffset = (Pi / frames)
       shifterGen <- shifterGenerator(width)(height)
       images = for {
         f <- (1 to frames)
