@@ -18,18 +18,18 @@ object Pusher extends GlitchTypes {
 
   def apply(fullSizedImage: BufferedImage): GlitchedGif = {
  
-    val image = fullSizedImage.setMaxHeight(400)
+    val image = fullSizedImage.setMaxHeight(300)
     val rand = new Random()
 
     val (width, height) = image.getSize()
 
     val genGlitches = for {
-      frames <- getFrameCount
       multiplier <- getFrameOffsetMultiplier
+      frames = 10
       frameOffset = (Pi / frames)
       shifterGen <- shifterGenerator(width)(height)
       images = for {
-        f <- (1 to frames)
+        f <- (0 to frames)
         offset = sin(f * frameOffset) * multiplier
         shifter = shifterGen(offset)
         runPusher = pusherGenerator(shifter)
@@ -42,12 +42,8 @@ object Pusher extends GlitchTypes {
 
   }
 
-  val getFrameCount = State[Random, Int] { rand =>
-    (rand, rand.nextInt(100) + 30)
-  }
-
   val getFrameOffsetMultiplier = State[Random, Int] { rand =>
-    (rand, rand.nextInt(100))
+    (rand, rand.nextInt(39) + 10)
   }
 
   val createShift: Int => State[Random, Int] = shiftMultiplier => State[Random, Int] { rand =>
@@ -56,8 +52,8 @@ object Pusher extends GlitchTypes {
 
 
   val shifterGenerator: Int => Int => State[Random, Double => PixelShifter] = width => height => for {
-    randXShift <- createShift(100)
-    randYShift <- createShift(100)
+    randXShift <- createShift(30)
+    randYShift <- createShift(15)
     xShifter = (mult: Double) => createShifter(randXShift)(mult)
     yShifter = (mult: Double) => createShifter(randYShift)(mult)
   } yield (mult: Double) => wrapCoords(width - 1, height - 1, xShifter(mult), yShifter(mult))

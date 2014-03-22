@@ -32,11 +32,14 @@ object FileOps {
     val baos = new ByteArrayOutputStream()
     val gifEncoder = new AnimatedGifEncoder()
     gifEncoder.start(baos)
+    gifEncoder.setQuality(30)
     gifEncoder.setRepeat(0)
-    gifEncoder.setFrameRate(30f)
 
     var count = 1
-    for (img <- gifFrames) {
+    gifEncoder.setDelay(4000)
+    gifEncoder.addFrame(gifFrames.head)
+    gifEncoder.setFrameRate(10f)
+    for (img <- gifFrames.tail) {
       gifEncoder.addFrame(img)
       println(s"written $count")
       count += 1
@@ -47,7 +50,6 @@ object FileOps {
     baos.close()
     GlitchedImageData(imageData, "gif")
 
-    imageData
 
   }
 
