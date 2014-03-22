@@ -43,7 +43,7 @@ object Pusher extends GlitchTypes {
   }
 
   val getFrameCount = State[Random, Int] { rand =>
-    (rand, rand.nextInt(300) + 100)
+    (rand, rand.nextInt(100) + 30)
   }
 
   val getFrameOffsetMultiplier = State[Random, Int] { rand =>
