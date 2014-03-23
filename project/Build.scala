@@ -32,9 +32,12 @@ object ScalaGlitch extends Build {
   lazy val config = "com.typesafe" % "config" % "1.2.0"
   lazy val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
 
+  lazy val scalacSettings = Seq("-feature", "-language:_", "-deprecation")
+
   lazy val defaultSettings = Defaults.defaultSettings ++ buildSettings ++ Seq(
     libraryDependencies += specs,
-    libraryDependencies += mockito
+    libraryDependencies += mockito,
+    scalacOptions ++= scalacSettings
   )
 
   lazy val cuttr = Project(
@@ -49,8 +52,6 @@ object ScalaGlitch extends Build {
       target in assembly := file("./assembled")
     ) ++ mergingStrategy
 
-  ).settings(
-    scalacOptions ++= Seq("-feature", "-language:_", "-deprecation")
   ) dependsOn(scalaglitch)
 
   lazy val scalaglitch = Project(
@@ -59,8 +60,6 @@ object ScalaGlitch extends Build {
     settings = defaultSettings ++ Seq(
       libraryDependencies += scalaz
     )
-  ).settings(
-    scalacOptions ++= Seq("-feature", "-language:_", "-deprecation")
   )
 
 }
