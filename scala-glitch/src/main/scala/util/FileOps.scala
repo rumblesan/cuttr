@@ -52,14 +52,16 @@ object FileOps {
 
   }
 
-  def glitchedImageToFile(data: GlitchedImageData): Unit = {
+  def glitchedImageToFile(filename: String, data: GlitchedImageData): File = {
 
-    val fos = new FileOutputStream(new File(s"test.${data.extension}"))
+    val outputFile = new File(s"$filename.${data.extension}")
+    val fos = new FileOutputStream(outputFile)
     val bos = new BufferedOutputStream(fos)
 
     bos.write(data.data);
     bos.close()
 
+    outputFile
   }
 
 }
