@@ -8,6 +8,7 @@ import com.rumblesan.cuttr.tumblr._
 import com.rumblesan.cuttr.models._
 import com.rumblesan.scalaglitch.Glitchr
 import com.rumblesan.scalaglitch.types.{ImageCanvas, GlitchedImageData}
+import com.rumblesan.scalaglitch.util.FileOps
 import com.rumblesan.util.tumblrapi.TumblrAPI
 
 import com.typesafe.config.ConfigFactory
@@ -32,15 +33,25 @@ object App {
 
     args.toList match {
 
-      case "-f" :: inputFile :: outputFile :: Nil => glitchFile(inputFile, outputFile)
+      case "-f" :: inputFile :: outputFile :: glitchType :: Nil => glitchFile(inputFile, outputFile, glitchType)
       case _ => tumblrBot
 
     }
 
   }
 
-  def glitchFile(inFile: String, outFile: String) {
-    println("Nothing here yet")
+  def glitchFile(inFile: String, outFile: String, glitchType: String) {
+
+    val inputImage = ImageCanvas(
+      ImageIO.read(new File(inFile)),
+      glitchType
+    )
+
+    val glitchedImage = Glitchr(inputImage)
+    val outputFile = FileOps.glitchedImageToFile(outFile, glitchedImage)
+
+    println("finished")
+
   }
 
   def tumblrBot {
