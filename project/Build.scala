@@ -9,9 +9,9 @@ object ScalaGlitch extends Build {
 
     organization := "com.rumblesan",
 
-    scalaVersion := "2.10.3",
+    scalaVersion := "2.11.6",
 
-    version := "0.3"
+    version := "0.4"
 
   )
 
@@ -25,18 +25,16 @@ object ScalaGlitch extends Build {
   )
 
   // Dependencies.
-  lazy val specs = "org.specs2" %% "specs2" % "2.3.10" % "test"
-  lazy val mockito = "org.mockito" % "mockito-core" % "1.9.5" % "test"
-  lazy val tumblrapi = "com.rumblesan.util" %% "tumblrapi" % "0.2.0"
-  lazy val argonaut = "io.argonaut" %% "argonaut" % "6.0.3"
+  lazy val tumblrapi = "com.rumblesan.util" %% "tumblrapi" % "0.3.0"
+  lazy val argonaut = "io.argonaut" %% "argonaut" % "6.0.4"
   lazy val config = "com.typesafe" % "config" % "1.2.0"
   lazy val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
+  lazy val scodec = "org.scodec" %% "scodec-core" % "1.7.1"
+  lazy val scodecbits = "org.scodec" %% "scodec-bits" % "1.0.6"
 
   lazy val scalacSettings = Seq("-feature", "-language:_", "-deprecation")
 
   lazy val defaultSettings = Defaults.defaultSettings ++ buildSettings ++ Seq(
-    libraryDependencies += specs,
-    libraryDependencies += mockito,
     scalacOptions ++= scalacSettings
   )
 
@@ -58,6 +56,8 @@ object ScalaGlitch extends Build {
     id = "scalaglitch",
     base = file("scala-glitch"),
     settings = defaultSettings ++ Seq(
+      libraryDependencies += scodec,
+      libraryDependencies += scodecbits,
       libraryDependencies += scalaz
     )
   )

@@ -26,6 +26,7 @@ object Glitchr extends GlitchTypes {
       case "smear" => smear(ImageIO.read(imageFile))
       case "cubist" => cubist(ImageIO.read(imageFile))
       case "pusher" => pusher(ImageIO.read(imageFile))
+      case "errror" => errror(imageFile)
       case _ => smear(ImageIO.read(imageFile))
     }
   }
@@ -35,6 +36,8 @@ object Glitchr extends GlitchTypes {
   def pusher(image: BufferedImage): GlitchedImage = Pusher(image)
 
   def cubist(image: BufferedImage): GlitchedImage = Cubist(image)
+
+  def errror(image: File): GlitchedImage = Errror(image)
 
 }
 
