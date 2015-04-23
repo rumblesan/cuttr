@@ -21,13 +21,13 @@ object Glitchr extends GlitchTypes {
     FileOps.glitchedImageToByteArray(glitchedImage)
   }
 
-  def canvasGlitch(imageFile: File, glitchType: String): GlitchedImage = {
+  def canvasGlitch(image: BufferedImage, glitchType: String): GlitchedImage = {
     glitchType match {
-      case "smear" => smear(ImageIO.read(imageFile))
-      case "cubist" => cubist(ImageIO.read(imageFile))
-      case "pusher" => pusher(ImageIO.read(imageFile))
-      case "errror" => errror(imageFile)
-      case _ => smear(ImageIO.read(imageFile))
+      case "smear" => smear(image)
+      case "cubist" => cubist(image)
+      case "pusher" => pusher(image)
+      case "errror" => errror(image)
+      case _ => smear(image)
     }
   }
 
@@ -37,7 +37,11 @@ object Glitchr extends GlitchTypes {
 
   def cubist(image: BufferedImage): GlitchedImage = Cubist(image)
 
-  def errror(image: File): GlitchedImage = Errror(image)
+  def errror(image: BufferedImage): GlitchedImage = {
+    val f = new File("temp.jpg")
+    ImageIO.write(image, "jpg", f);
+    Errror(f)
+  }
 
 }
 

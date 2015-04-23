@@ -43,7 +43,7 @@ object App {
   def glitchFile(inFile: String, outFile: String, glitchType: String) {
 
     val inputImage = ImageCanvas(
-      new File(inFile),
+      ImageIO.read(new File(inFile)),
       glitchType
     )
 
@@ -90,8 +90,8 @@ object App {
 
   def glitchImage(photo: CuttrPhoto, glitch: String): Option[GlitchedImageData] = {
     val source = ImageCanvas(
-      new File(
-        new URL(photo.imgUrl).toURI()
+      ImageIO.read(
+        new URL(photo.imgUrl)
       ),
       glitch
     )
