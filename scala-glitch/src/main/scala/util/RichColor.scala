@@ -20,6 +20,13 @@ case class RichColor(color:Color) {
     new Color((r.min(255)), (g.min(255)), (b.min(255)))
   }
 
+  def getBrightness(): Double = {
+    val r = color.getRed()
+    val g = color.getGreen()
+    val b = color.getBlue()
+    (0.299*r + 0.587*g + 0.114*b)/255
+  }
+
 }
 
 object RichColor {

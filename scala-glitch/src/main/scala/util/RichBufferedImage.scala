@@ -19,6 +19,10 @@ case class RichBufferedImage(image:BufferedImage) {
     image.setRGB(x, y, c.getRGB())
   }
 
+  def getBrightness(coords: (Int, Int)): Double = {
+    image.getPixel(coords).getBrightness()
+  }
+
   def setRed(coords:Pair[Int,Int], r:Int):Unit = {
     val (x, y) = coords
     val c = image.getPixel(x, y)

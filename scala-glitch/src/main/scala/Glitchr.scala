@@ -27,6 +27,7 @@ object Glitchr extends GlitchTypes {
       case "cubist" => cubist(image)
       case "pusher" => pusher(image)
       case "errror" => errror(image)
+      case "fade" => fade(image)
       case _ => smear(image)
     }
   }
@@ -42,6 +43,8 @@ object Glitchr extends GlitchTypes {
     ImageIO.write(image, "jpg", f);
     Errror(f)
   }
+
+  def fade(image: BufferedImage): GlitchedImage = Fade(image)
 
 }
 
