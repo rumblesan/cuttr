@@ -5,7 +5,9 @@ import java.awt.image.BufferedImage
 
 trait GlitchTypes {
 
-  type PixelShifter = Pair[Int, Int] => Pair[Int, Int]
+  type Coord = (Int, Int)
+
+  type PixelShifter = Coord => Coord
 
 }
 

@@ -1,9 +1,11 @@
 package com.rumblesan.scalaglitch.util
 
-object CoordWrapper {
+import com.rumblesan.scalaglitch.types._
 
-  def wrapCoords(width: Int, height: Int, xFunc:(Int => Int), yFunc:(Int => Int)): Pair[Int, Int] => Pair[Int, Int] = {
-    (coords:Pair[Int,Int]) => {
+object CoordWrapper extends GlitchTypes {
+
+  def wrapCoords(width: Int, height: Int, xFunc:(Int => Int), yFunc:(Int => Int)): Coord => Coord = {
+    (coords: Coord) => {
       (inRange(width,  xFunc(coords._1)),
        inRange(height, yFunc(coords._2)))
     }

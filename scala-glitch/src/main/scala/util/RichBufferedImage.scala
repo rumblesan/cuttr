@@ -6,20 +6,21 @@ import java.awt.Color
 import javax.imageio.ImageIO
 import java.io.ByteArrayOutputStream
 
+import com.rumblesan.scalaglitch.types._
 
 import scodec.bits._
 
 import RichBufferedImage._
 import RichColor._
 
-case class RichBufferedImage(image:BufferedImage) {
+case class RichBufferedImage(image:BufferedImage) extends GlitchTypes {
 
-  def getPixel(coords:Pair[Int,Int]):Color = {
+  def getPixel(coords: Coord):Color = {
     val (x, y) = coords
     new Color (image.getRGB(x, y))
   }
 
-  def setPixel(coords:Pair[Int,Int], c:Color):Unit = {
+  def setPixel(coords: Coord, c:Color):Unit = {
     val (x, y) = coords
     image.setRGB(x, y, c.getRGB())
   }
@@ -28,35 +29,35 @@ case class RichBufferedImage(image:BufferedImage) {
     image.getPixel(coords).getBrightness()
   }
 
-  def setRed(coords:Pair[Int,Int], r:Int):Unit = {
+  def setRed(coords: Coord, r:Int):Unit = {
     val (x, y) = coords
     val c = image.getPixel(x, y)
     val newC = new Color(r, c.getGreen(), c.getBlue())
     image.setRGB(x, y, newC.getRGB())
   }
 
-  def setGreen(coords:Pair[Int,Int], g:Int):Unit = {
+  def setGreen(coords: Coord, g:Int):Unit = {
     val (x, y) = coords
     val c = image.getPixel(x, y)
     val newC = new Color(c.getRed(), g, c.getBlue())
     image.setRGB(x, y, newC.getRGB())
   }
 
-  def setBlue(coords:Pair[Int,Int], b:Int):Unit = {
+  def setBlue(coords: Coord, b:Int):Unit = {
     val (x, y) = coords
     val c = image.getPixel(x, y)
     val newC = new Color(c.getRed(), c.getGreen(), b)
     image.setRGB(x, y, newC.getRGB())
   }
 
-  def addPixel(coords:Pair[Int,Int], c:Color):Unit = {
+  def addPixel(coords: Coord, c:Color):Unit = {
     val (x, y) = coords
     val currentColor = image.getPixel(x,y)
     val newColor = currentColor + c
     image.setRGB(x, y, newColor.getRGB())
   }
 
-  def getSize():Pair[Int, Int] = {
+  def getSize(): Coord = {
     val width  = image.getWidth()
     val height = image.getHeight()
     (width, height)
