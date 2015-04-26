@@ -3,6 +3,11 @@ package com.rumblesan.scalaglitch.util
 import java.awt.{Image, Graphics}
 import java.awt.image.{BufferedImage, ColorModel, WritableRaster}
 import java.awt.Color
+import javax.imageio.ImageIO
+import java.io.ByteArrayOutputStream
+
+
+import scodec.bits._
 
 import RichBufferedImage._
 import RichColor._
@@ -79,6 +84,15 @@ case class RichBufferedImage(image:BufferedImage) {
 
   def createGlitch(glitchFunction: BufferedImage => BufferedImage): BufferedImage = {
     glitchFunction(image.deepClone())
+  }
+
+  def getJpegBytes: ByteVector = {
+    val baos = new ByteArrayOutputStream()
+    ImageIO.write(image, "jpg", baos)
+    baos.flush()
+    val output = ByteVector(baos.toByteArray())
+    baos.close();
+    output
   }
 
 }
