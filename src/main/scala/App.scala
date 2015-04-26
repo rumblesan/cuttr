@@ -106,7 +106,7 @@ object App {
       Map(
         "type" -> "photo",
         "caption" -> photoCaption,
-        "tags" -> "Cuttr, glitch, generative, random, %s".format(config.searchTag)
+        "tags" -> s"Cuttr, glitch, generative, random, ${config.searchTag}, ${config.glitchType}"
       ),
       photoData.data,
       photoData.extension
