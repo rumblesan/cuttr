@@ -38,11 +38,7 @@ object Glitchr extends GlitchTypes {
 
   def cubist(image: BufferedImage): GlitchedImage = Cubist(image)
 
-  def errror(image: BufferedImage): GlitchedImage = {
-    val f = new File("temp.jpg")
-    ImageIO.write(image, "jpg", f);
-    Errror(f)
-  }
+  def errror(image: BufferedImage): GlitchedImage = Errror(image)
 
   def fade(image: BufferedImage): GlitchedImage = Fade(image)
 

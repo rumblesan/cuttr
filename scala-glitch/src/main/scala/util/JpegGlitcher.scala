@@ -1,9 +1,35 @@
 package com.rumblesan.scalaglitch.util
 
+import com.rumblesan.scalaglitch.util.RichBufferedImage._
+
+import scodec.bits._
+
 import scala.util.Random
+import java.io.{ByteArrayInputStream}
+import java.awt.image.BufferedImage
+import javax.imageio.ImageIO
 
 
 object JpegGlitcher {
+
+  def apply(image: BufferedImage, chance: Int): BufferedImage = {
+    val bytes = image.getJpegBytes
+
+    val sections = JpegParser.parse(bytes).map(s => {
+      if (s.name == "DQT") {
+        JpegGlitcher.glitchQuantTable(s, chance)
+      } else {
+        s
+      }
+    })
+
+    val dataout = sections.foldLeft(ByteVector.empty)((out, sect) => {
+      out ++ JpegParser.writeData(sect)
+    })
+
+    ImageIO.read(new ByteArrayInputStream(dataout.toArray))
+
+  }
 
   def glitchQuantTable(struct: JpegStructureData, glitchChance: Int): JpegStructureData = {
 
