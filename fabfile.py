@@ -11,7 +11,7 @@ def build():
 
 
 def deploy():
-    put('assembled/cuttr.jar', '~/tumblrscripts/cuttr')
-    run('chmod +x /home/%s/tumblrscripts/cuttr/cuttr.jar' % env.GLITCHUSER)
-    run('chown %s:%s /home/%s/tumblrscripts/cuttr/cuttr.jar' %
-        (env.GLITCHUSER, env.GLITCHGROUP, env.GLITCHUSER))
+    cuttrdir = '/home/%s/cuttr' % env.GLITCHUSER
+    put('assembled/cuttr.jar', cuttrdir)
+    run('chmod +x %s/cuttr.jar' % cuttrdir)
+    run('chown %s:%s %s/cuttr.jar' % (env.GLITCHUSER, env.GLITCHGROUP, cuttrdir))
