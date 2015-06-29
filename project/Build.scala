@@ -31,9 +31,11 @@ object ScalaGlitch extends Build {
   lazy val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
   lazy val scodec = "org.scodec" %% "scodec-core" % "1.7.1"
   lazy val scodecbits = "org.scodec" %% "scodec-bits" % "1.0.6"
+  lazy val scopt = "com.github.scopt" %% "scopt" % "3.3.0"
 
   lazy val scalacSettings = Seq("-feature", "-language:_", "-deprecation")
 
+  lazy val sonnatypeRepo = Resolver.sonatypeRepo("public")
   lazy val defaultSettings = Defaults.defaultSettings ++ buildSettings ++ Seq(
     scalacOptions ++= scalacSettings
   )
@@ -46,6 +48,8 @@ object ScalaGlitch extends Build {
       libraryDependencies += config,
       libraryDependencies += tumblrapi,
       libraryDependencies += argonaut,
+      libraryDependencies += scopt,
+      resolvers += sonnatypeRepo,
       jarName in assembly := "cuttr.jar",
       target in assembly := file("./assembled")
     ) ++ mergingStrategy

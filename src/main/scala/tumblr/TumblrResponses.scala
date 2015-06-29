@@ -3,6 +3,8 @@ package com.rumblesan.cuttr.tumblr
 import argonaut._, Argonaut._
 
 import com.rumblesan.util.tumblrapi.TumblrAPI
+import com.rumblesan.scalaglitch.types.GlitchedImageData
+import com.rumblesan.cuttr.util.CuttrConfig
 
 
 object Tumblr {
@@ -17,8 +19,9 @@ object Tumblr {
       filtered = filterPostType(postArray, "photo")
       output <- jArray(filtered).jdecode[List[PhotoPost]].toOption
     } yield output
-
   }
+
+  def getSpecificPost(tumblrPostId: String): Option[PhotoPost] = None
 
   def filterPostType(posts: JsonArray, `type`: String): JsonArray = {
     for {
@@ -29,6 +32,33 @@ object Tumblr {
     } yield element
   }
 
+  def postToTumblr(tumblr: TumblrAPI, config: CuttrConfig, photoData: GlitchedImageData, photoCaption: String): Option[String] = {
+    tumblr.post(
+      "post",
+      config.blogUrl,
+      Map(
+        "type" -> "photo",
+        "caption" -> photoCaption,
+        "tags" -> s"Cuttr, glitch, generative, random, ${config.searchTag}, ${config.glitchType}"
+      ),
+      photoData.data,
+      photoData.extension
+    )
+  }
+
+  def checkResponse(response: TumblrResponse[PostId], url: String): Option[Int] = {
+    response.meta match {
+      case Meta(201, msg) => {
+        println("Post url:\n    http://%s/post/%d".format(url, response.response.id))
+        Some(0)
+      }
+      case Meta(status, msg) => {
+        println("Status code %d was returned when creating post".format(status))
+        println("    %s".format(msg))
+        None
+      }
+    }
+  }
 }
 
 

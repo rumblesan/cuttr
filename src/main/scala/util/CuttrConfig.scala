@@ -4,6 +4,8 @@ import com.typesafe.config.{ Config, ConfigFactory }
 
 import com.rumblesan.util.tumblrapi.TumblrAPI
 
+import scopt.OptionParser
+
 case class CuttrConfig(tumblrApi: TumblrAPI, blogUrl: String, searchTag: String, glitchType: String)
 
 trait TumblrApiCreation {
@@ -49,4 +51,36 @@ trait CuttrConfigOps {
 
 
 object CuttrConfig extends CuttrConfigOps with TumblrApiCreation
+
+object CuttrCliParser {
+
+  val parser = new OptionParser[CuttrCliConfig]("cuttr") {
+    head("cuttr", "0.4")
+    opt[String]('f', "file") action { (x, c) =>
+      c.copy(inputFile = Some(x)) } text("Input file to glitch")
+    opt[String]('i', "id") action { (x, c) =>
+      c.copy(inputTumblrPost = Some(x)) } text("Tumblr post id to glitch")
+    opt[Unit]('r', "random") action { (_, c) =>
+      c.copy(randomTumblr = true) } text("Glitch a random Tumblr post")
+    opt[String]('o', "output") action { (x, c) =>
+      c.copy(outputFile = Some(x)) } text("Write image to file")
+    opt[Unit]('p', "post") action { (_, c) =>
+      c.copy(postTumblr = true) } text("Post to Tumblr")
+    opt[String]('t', "tag") action { (x, c) =>
+      c.copy(searchTag = Some(x)) } text("Tag to search")
+    opt[String]('g', "glitch") action { (x, c) =>
+      c.copy(glitch = x) } text("Glitch to use")
+  }
+}
+
+case class CuttrCliConfig(
+  inputFile: Option[String] = None,
+  inputTumblrPost: Option[String] = None,
+  randomTumblr: Boolean = false,
+  outputFile: Option[String] = None,
+  postTumblr: Boolean = false,
+  searchTag: Option[String] = None,
+  glitch: String = "cuttr"
+)
+
 
