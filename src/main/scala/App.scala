@@ -53,67 +53,70 @@ object App {
 
     CuttrCliParser.parser.parse(args, CuttrCliConfig()) match {
       case Some(cliConfig) => run(cliConfig)
-      case None => println("parsed args")
+      case None => println("Error with cli args")
     }
   }
 
   def run(cliConfig: CuttrCliConfig) {
 
-    val glitchedImage: Option[GlitchedPhotoPost] = (cliConfig.inputFile, cliConfig.inputTumblrPost, cliConfig.randomTumblr) match {
-      case (Some(filePath), _, _) => glitchFile(filePath, cliConfig.glitch)
-      case (None, Some(postId), _) => glitchPost(postId, cliConfig.glitch)
-      case (None, None, true) => glitchRandomPost(cliConfig.searchTag.getOrElse(config.searchTag), cliConfig.glitch)
-      case _ => {
-        println("Could not do something")
-        None
+    val exitCode: Option[Int] = (
+      (cliConfig.inputFile, cliConfig.inputTumblrPost, cliConfig.randomTumblr) match {
+        case (Some(filePath), _, _) => glitchFile(filePath, cliConfig.glitch)
+        case (None, Some(postId), _) => glitchPost(postId, cliConfig.glitch)
+        case (None, None, true) => glitchRandomPost(cliConfig.searchTag.getOrElse(config.searchTag), cliConfig.glitch)
+        case _ => {
+          println("No input specified")
+          None
+        }
       }
-    }
-
-    val exitCode: Option[Int] = glitchedImage.flatMap(
+    ).flatMap(
       imageInfo => (cliConfig.outputFile, cliConfig.postTumblr) match {
-        case (Some(outputFile), _) => writeToFile("output", imageInfo.imageData)
+        case (Some(outputFile), _) => writeToFile(outputFile, imageInfo.imageData)
         case (None, true) => postToTumblr(imageInfo.imageData, imageInfo.caption)
-        case _ => None
+        case _ => {
+          println("No output specified")
+          None
+        }
       }
     )
-
     System.exit(
       exitCode.getOrElse(1)
     )
   }
 
   def glitchFile(inFile: String, glitchType: String): Option[GlitchedPhotoPost] = {
-
-    val inputImage = ImageCanvas(
-      ImageIO.read(new File(inFile)),
-      glitchType
+    Some(
+      GlitchedPhotoPost(
+        "Glitched input file",
+        Glitchr(
+          ImageCanvas(
+            ImageIO.read(new File(inFile)),
+            glitchType
+          )
+        )
+      )
     )
-
-    val glitchedImage = Glitchr(inputImage)
-
-    Some(GlitchedPhotoPost("Glitched file", glitchedImage))
   }
 
   def glitchPost(tumblrPostId: String, glitchType: String): Option[GlitchedPhotoPost] = {
-    println("Glitching post %s".format(tumblrPostId))
+    println(s"Glitching post $tumblrPostId")
     for {
       post <- Tumblr.getSpecificPost(config.tumblrApi, tumblrPostId)
       _ = println(s"Retrieved post")
-      originalImages <- getOriginalImages(List(post))
+      originalImages = getOriginalImages(List(post))
       photo <- Random.shuffle(originalImages).headOption
       _ = println(s"Chosen image at ${photo.imgUrl}")
       _ = println(s"Glitching with ${glitchType}")
       photoData <- glitchImage(photo, glitchType)
     } yield GlitchedPhotoPost("glitched post", photoData)
-
   }
 
   def glitchRandomPost(searchTag: String, glitchType: String): Option[GlitchedPhotoPost] = {
-    println("Updating %s with photos from tag %s".format(config.blogUrl, searchTag))
+    println(s"Updating ${config.blogUrl} with photos from tag ${searchTag}")
     for {
       tumblrPhotos <- Tumblr.getTaggedPhotos(config.tumblrApi, searchTag)
       _ = println(s"Retrieved ${tumblrPhotos.length} photos")
-      originalImages <- getOriginalImages(tumblrPhotos)
+      originalImages = getOriginalImages(tumblrPhotos)
       photo <- Random.shuffle(originalImages).headOption
       _ = println(s"Chosen image at ${photo.imgUrl}")
       _ = println("Glitching and then sending to Tumblr")
@@ -125,7 +128,6 @@ object App {
   def writeToFile(outputPath: String, glitchedImage: GlitchedImageData): Option[Int] = {
     val outputFile = FileOps.glitchedImageToFile(outputPath, glitchedImage)
     println(s"Written to ${outputFile.getAbsolutePath()}")
-
     Some(0)
   }
 
@@ -137,26 +139,24 @@ object App {
     } yield exitcode
   }
 
-  def getOriginalImages(photoposts: List[PhotoPost]): Option[List[CuttrPhoto]] = {
-    Some(
-      for {
-        post <- photoposts
-        photos = post.photos
-        photo <- photos
-        original = photo.original_size
-      } yield CuttrPhoto(original.url, post.blog_name, post.post_url, post.date)
-    )
+  def getOriginalImages(photoposts: List[PhotoPost]): List[CuttrPhoto] = {
+    for {
+      post <- photoposts
+      photos = post.photos
+      photo <- photos
+      original = photo.original_size
+    } yield CuttrPhoto(original.url, post.blog_name, post.post_url, post.date)
   }
 
   def glitchImage(photo: CuttrPhoto, glitch: String): Option[GlitchedImageData] = {
-    val source = ImageCanvas(
-      ImageIO.read(
-        new URL(photo.imgUrl)
-      ),
-      glitch
+    Some(
+      Glitchr(
+        ImageCanvas(
+          ImageIO.read(new URL(photo.imgUrl)),
+          glitch
+        )
+      )
     )
-
-    Some(Glitchr(source))
   }
 
 
