@@ -21,7 +21,22 @@ object Tumblr {
     } yield output
   }
 
-  def getSpecificPost(tumblrPostId: String): Option[PhotoPost] = None
+  def getSpecificPost(tumblr: TumblrAPI, tumblrPostId: String): Option[PhotoPost] = {
+    val blogPostId = tumblrPostId.split(":").toList
+    for {
+      blogUrl <- blogPostId.headOption
+      postId <- blogPostId.tail.headOption
+      stringdata <- tumblr.get("posts", blogUrl, Map("id" -> postId))
+      jsondata <- stringdata.parseOption
+      cursor = jsondata.cursor
+      responseCursor <- cursor.downField("response")
+      postsCursor <- responseCursor.downField("posts")
+      postArray <- postsCursor.focus.array
+      filtered = filterPostType(postArray, "photo")
+      output <- jArray(filtered).jdecode[List[PhotoPost]].toOption
+      post <- output.headOption
+    } yield post
+  }
 
   def filterPostType(posts: JsonArray, `type`: String): JsonArray = {
     for {
