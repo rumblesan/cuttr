@@ -52,6 +52,8 @@ object CuttrCliParser {
     head("cuttr", "0.4")
     opt[String]('f', "file") action { (x, c) =>
       c.copy(inputFile = Some(x)) } text("Input file to glitch")
+    opt[String]('c', "caption") action { (x, c) =>
+      c.copy(imageCaption = Some(x)) } text("Caption for tumblr post")
     opt[String]('i', "id") action { (x, c) =>
       c.copy(inputTumblrPost = Some(x)) } text("Tumblr post id to glitch")
     opt[Unit]('r', "random") action { (_, c) =>
@@ -71,6 +73,7 @@ object CuttrCliParser {
 
 case class CuttrCliConfig(
   inputFile: Option[String] = None,
+  imageCaption: Option[String] = None,
   inputTumblrPost: Option[String] = None,
   randomTumblr: Boolean = false,
   outputFile: Option[String] = None,

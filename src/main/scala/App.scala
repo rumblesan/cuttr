@@ -64,9 +64,10 @@ object App {
     val glitchType = cliConfig.glitch
     val blogUrl = cliConfig.blogUrl.getOrElse(fileConfig.blogUrl)
     val tumblrApi = fileConfig.tumblrApi
+    val caption = cliConfig.imageCaption.getOrElse("")
     (
       (cliConfig.inputFile, cliConfig.inputTumblrPost, cliConfig.randomTumblr) match {
-        case (Some(filePath), _, _) => glitchFile(filePath, glitchType)
+        case (Some(filePath), _, _) => Some(GlitchedPhotoPost(caption, glitchFile(filePath, glitchType)))
         case (None, Some(postId), _) => glitchPost(tumblrApi, postId, glitchType)
         case (None, None, true) => glitchRandomPost(tumblrApi, searchTag, glitchType)
         case _ => {
@@ -86,16 +87,11 @@ object App {
     )
   }
 
-  def glitchFile(inFile: String, glitchType: String): Option[GlitchedPhotoPost] = {
-    Some(
-      GlitchedPhotoPost(
-        "Glitched input file",
-        Glitchr(
-          ImageCanvas(
-            ImageIO.read(new File(inFile)),
-            glitchType
-          )
-        )
+  def glitchFile(inFile: String, glitchType: String): GlitchedImageData = {
+    Glitchr(
+      ImageCanvas(
+        ImageIO.read(new File(inFile)),
+        glitchType
       )
     )
   }
@@ -108,7 +104,7 @@ object App {
       photo <- Random.shuffle(originalImages).headOption
       _ = println(s"Glitching chosen image: ${photo.imgUrl}")
       photoData <- glitchImage(photo, glitchType)
-    } yield GlitchedPhotoPost("glitched post", photoData)
+    } yield GlitchedPhotoPost(photo.caption, photoData)
   }
 
   def glitchRandomPost(tumblrApi: TumblrAPI, searchTag: String, glitchType: String): Option[GlitchedPhotoPost] = {
