@@ -68,6 +68,8 @@ object CuttrCliParser {
       c.copy(postTumblr = true) } text("Post to Tumblr")
     opt[String]('t', "tag") action { (x, c) =>
       c.copy(searchTag = Some(x)) } text("Tag to search")
+    opt[String]('b', "blog") action { (x, c) =>
+      c.copy(blogUrl = Some(x)) } text("Blog to update")
     opt[String]('g', "glitch") action { (x, c) =>
       c.copy(glitch = x) } text("Glitch to use")
   }
@@ -80,6 +82,7 @@ case class CuttrCliConfig(
   outputFile: Option[String] = None,
   postTumblr: Boolean = false,
   searchTag: Option[String] = None,
+  blogUrl: Option[String] = None,
   glitch: String = "cuttr"
 )
 

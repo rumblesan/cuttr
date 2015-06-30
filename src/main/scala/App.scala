@@ -29,6 +29,8 @@ object App {
 
   case class GlitchedPhotoPost(caption: String, imageData: GlitchedImageData)
 
+  lazy val defaultSearchTag = "skyline"
+
   /**
    * cuttr.jar
    * [-f <filename> | --file <filename>]
@@ -52,17 +54,21 @@ object App {
     System.exit(
       (for {
         cliConfig <- CuttrCliParser.parser.parse(args, CuttrCliConfig())
-        exitCode <- run(cliConfig)
+        exitCode <- run(cliConfig, config)
       } yield exitCode).getOrElse(1)
     )
   }
 
-  def run(cliConfig: CuttrCliConfig): Option[Int] = {
+  def run(cliConfig: CuttrCliConfig, fileConfig: CuttrConfig): Option[Int] = {
+    val searchTag = cliConfig.searchTag.getOrElse(defaultSearchTag)
+    val glitchType = cliConfig.glitch
+    val blogUrl = cliConfig.blogUrl.getOrElse(fileConfig.blogUrl)
+    val tumblrApi = fileConfig.tumblrApi
     (
       (cliConfig.inputFile, cliConfig.inputTumblrPost, cliConfig.randomTumblr) match {
-        case (Some(filePath), _, _) => glitchFile(filePath, cliConfig.glitch)
-        case (None, Some(postId), _) => glitchPost(postId, cliConfig.glitch)
-        case (None, None, true) => glitchRandomPost(cliConfig.searchTag.getOrElse(config.searchTag), cliConfig.glitch)
+        case (Some(filePath), _, _) => glitchFile(filePath, glitchType)
+        case (None, Some(postId), _) => glitchPost(tumblrApi, postId, glitchType)
+        case (None, None, true) => glitchRandomPost(tumblrApi, searchTag, glitchType)
         case _ => {
           println("No input specified")
           None
@@ -71,7 +77,7 @@ object App {
     ).flatMap(
       imageInfo => (cliConfig.outputFile, cliConfig.postTumblr) match {
         case (Some(outputFile), _) => writeToFile(outputFile, imageInfo.imageData)
-        case (None, true) => postToTumblr(imageInfo.imageData, imageInfo.caption)
+        case (None, true) => postToTumblr(tumblrApi, imageInfo.imageData, imageInfo.caption, blogUrl, searchTag, glitchType)
         case _ => {
           println("No output specified")
           None
@@ -94,9 +100,9 @@ object App {
     )
   }
 
-  def glitchPost(tumblrPostId: String, glitchType: String): Option[GlitchedPhotoPost] = {
+  def glitchPost(tumblrApi: TumblrAPI, tumblrPostId: String, glitchType: String): Option[GlitchedPhotoPost] = {
     for {
-      post <- Tumblr.getSpecificPost(config.tumblrApi, tumblrPostId)
+      post <- Tumblr.getSpecificPost(tumblrApi, tumblrPostId)
       _ = println(s"Retrieved post: $tumblrPostId")
       originalImages = getOriginalImages(List(post))
       photo <- Random.shuffle(originalImages).headOption
@@ -105,9 +111,9 @@ object App {
     } yield GlitchedPhotoPost("glitched post", photoData)
   }
 
-  def glitchRandomPost(searchTag: String, glitchType: String): Option[GlitchedPhotoPost] = {
+  def glitchRandomPost(tumblrApi: TumblrAPI, searchTag: String, glitchType: String): Option[GlitchedPhotoPost] = {
     for {
-      tumblrPhotos <- Tumblr.getTaggedPhotos(config.tumblrApi, searchTag)
+      tumblrPhotos <- Tumblr.getTaggedPhotos(tumblrApi, searchTag)
       _ = println(s"Retrieved ${tumblrPhotos.length} photos")
       originalImages = getOriginalImages(tumblrPhotos)
       _ = println(s"Found ${originalImages.length} images")
@@ -124,12 +130,12 @@ object App {
     Some(0)
   }
 
-  def postToTumblr(glitchedImage: GlitchedImageData, caption: String): Option[Int] = {
+  def postToTumblr(tumblrApi: TumblrAPI, glitchedImage: GlitchedImageData, caption: String, blogUrl: String, searchTag: String, glitchType: String): Option[Int] = {
     for {
-      jsondata <- Tumblr.postToTumblr(config.tumblrApi, config, glitchedImage, caption)
-      _ = println(s"Posting image to ${config.blogUrl}")
+      jsondata <- Tumblr.postToTumblr(tumblrApi, blogUrl, searchTag, glitchType, glitchedImage, caption)
+      _ = println(s"Posting image to ${blogUrl}")
       response <- jsondata.decodeOption[TumblrResponse[PostId]]
-      exitcode <- Tumblr.checkResponse(response, config.blogUrl)
+      exitcode <- Tumblr.checkResponse(response, blogUrl)
     } yield exitcode
   }
 

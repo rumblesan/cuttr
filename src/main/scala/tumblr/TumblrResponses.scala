@@ -47,14 +47,14 @@ object Tumblr {
     } yield element
   }
 
-  def postToTumblr(tumblr: TumblrAPI, config: CuttrConfig, photoData: GlitchedImageData, photoCaption: String): Option[String] = {
+  def postToTumblr(tumblr: TumblrAPI, blogUrl: String, searchTag: String, glitchType: String, photoData: GlitchedImageData, photoCaption: String): Option[String] = {
     tumblr.post(
       "post",
-      config.blogUrl,
+      blogUrl,
       Map(
         "type" -> "photo",
         "caption" -> photoCaption,
-        "tags" -> s"Cuttr, glitch, generative, random, ${config.searchTag}, ${config.glitchType}"
+        "tags" -> s"Cuttr, glitch, generative, random, ${searchTag}, ${glitchType}"
       ),
       photoData.data,
       photoData.extension
