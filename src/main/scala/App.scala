@@ -48,18 +48,17 @@ object App {
    *     which glitch to use
    */
   def main(args: Array[String]) {
-
     println("###########\n#  Cuttr  #\n###########")
-
-    CuttrCliParser.parser.parse(args, CuttrCliConfig()) match {
-      case Some(cliConfig) => run(cliConfig)
-      case None => println("Error with cli args")
-    }
+    System.exit(
+      (for {
+        cliConfig <- CuttrCliParser.parser.parse(args, CuttrCliConfig())
+        exitCode <- run(cliConfig)
+      } yield exitCode).getOrElse(1)
+    )
   }
 
-  def run(cliConfig: CuttrCliConfig) {
-
-    val exitCode: Option[Int] = (
+  def run(cliConfig: CuttrCliConfig): Option[Int] = {
+    (
       (cliConfig.inputFile, cliConfig.inputTumblrPost, cliConfig.randomTumblr) match {
         case (Some(filePath), _, _) => glitchFile(filePath, cliConfig.glitch)
         case (None, Some(postId), _) => glitchPost(postId, cliConfig.glitch)
@@ -79,9 +78,6 @@ object App {
         }
       }
     )
-    System.exit(
-      exitCode.getOrElse(1)
-    )
   }
 
   def glitchFile(inFile: String, glitchType: String): Option[GlitchedPhotoPost] = {
@@ -99,27 +95,24 @@ object App {
   }
 
   def glitchPost(tumblrPostId: String, glitchType: String): Option[GlitchedPhotoPost] = {
-    println(s"Glitching post $tumblrPostId")
     for {
       post <- Tumblr.getSpecificPost(config.tumblrApi, tumblrPostId)
-      _ = println(s"Retrieved post")
+      _ = println(s"Retrieved post: $tumblrPostId")
       originalImages = getOriginalImages(List(post))
       photo <- Random.shuffle(originalImages).headOption
-      _ = println(s"Chosen image at ${photo.imgUrl}")
-      _ = println(s"Glitching with ${glitchType}")
+      _ = println(s"Glitching chosen image: ${photo.imgUrl}")
       photoData <- glitchImage(photo, glitchType)
     } yield GlitchedPhotoPost("glitched post", photoData)
   }
 
   def glitchRandomPost(searchTag: String, glitchType: String): Option[GlitchedPhotoPost] = {
-    println(s"Updating ${config.blogUrl} with photos from tag ${searchTag}")
     for {
       tumblrPhotos <- Tumblr.getTaggedPhotos(config.tumblrApi, searchTag)
       _ = println(s"Retrieved ${tumblrPhotos.length} photos")
       originalImages = getOriginalImages(tumblrPhotos)
+      _ = println(s"Found ${originalImages.length} images")
       photo <- Random.shuffle(originalImages).headOption
-      _ = println(s"Chosen image at ${photo.imgUrl}")
-      _ = println("Glitching and then sending to Tumblr")
+      _ = println(s"Glitching chosen image: ${photo.imgUrl}")
       photoData <- glitchImage(photo, glitchType)
     } yield GlitchedPhotoPost(photo.caption, photoData)
   }
@@ -134,6 +127,7 @@ object App {
   def postToTumblr(glitchedImage: GlitchedImageData, caption: String): Option[Int] = {
     for {
       jsondata <- Tumblr.postToTumblr(config.tumblrApi, config, glitchedImage, caption)
+      _ = println(s"Posting image to ${config.blogUrl}")
       response <- jsondata.decodeOption[TumblrResponse[PostId]]
       exitcode <- Tumblr.checkResponse(response, config.blogUrl)
     } yield exitcode
@@ -158,7 +152,6 @@ object App {
       )
     )
   }
-
 
 }
 
