@@ -6,7 +6,7 @@ import com.rumblesan.util.tumblrapi.TumblrAPI
 
 import scopt.OptionParser
 
-case class CuttrConfig(tumblrApi: TumblrAPI, blogUrl: String, searchTag: String, glitchType: String)
+case class CuttrFileConfig(tumblrApi: TumblrAPI, blogUrl: String)
 
 trait TumblrApiCreation {
 
@@ -21,9 +21,9 @@ trait TumblrApiCreation {
 
 }
 
-trait CuttrConfigOps {
+trait CuttrFileConfigOps {
 
-  def create(config: Config): CuttrConfig = {
+  def create(config: Config): CuttrFileConfig = {
 
     val tumblrApi = new TumblrAPI(
       config.getString("cuttr.oauth.apiKey"),
@@ -34,15 +34,9 @@ trait CuttrConfigOps {
 
     val blogUrl = config.getString("cuttr.blog.url")
 
-    val searchTag = config.getString("cuttr.search.tag")
-
-    val glitchType = config.getString("cuttr.glitch.type")
-
-    CuttrConfig(
+    CuttrFileConfig(
       tumblrApi,
-      blogUrl,
-      searchTag,
-      glitchType
+      blogUrl
     )
 
   }
@@ -50,7 +44,7 @@ trait CuttrConfigOps {
 }
 
 
-object CuttrConfig extends CuttrConfigOps with TumblrApiCreation
+object CuttrFileConfig extends CuttrFileConfigOps with TumblrApiCreation
 
 object CuttrCliParser {
 

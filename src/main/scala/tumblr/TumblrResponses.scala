@@ -4,7 +4,6 @@ import argonaut._, Argonaut._
 
 import com.rumblesan.util.tumblrapi.TumblrAPI
 import com.rumblesan.scalaglitch.types.GlitchedImageData
-import com.rumblesan.cuttr.util.CuttrConfig
 
 
 object Tumblr {

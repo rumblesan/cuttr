@@ -3,7 +3,7 @@ package com.rumblesan.cuttr
 import scala.io.Source
 import scala.util.Random
 
-import com.rumblesan.cuttr.util.{CuttrConfig, CuttrCliConfig, CuttrCliParser}
+import com.rumblesan.cuttr.util.{CuttrFileConfig, CuttrCliConfig, CuttrCliParser}
 import com.rumblesan.cuttr.tumblr._
 import com.rumblesan.cuttr.models._
 import com.rumblesan.scalaglitch.Glitchr
@@ -23,7 +23,7 @@ import java.net.URL
 
 object App {
 
-  lazy val config = CuttrConfig.create(
+  lazy val config = CuttrFileConfig.create(
     ConfigFactory.load()
   )
 
@@ -59,7 +59,7 @@ object App {
     )
   }
 
-  def run(cliConfig: CuttrCliConfig, fileConfig: CuttrConfig): Option[Int] = {
+  def run(cliConfig: CuttrCliConfig, fileConfig: CuttrFileConfig): Option[Int] = {
     val searchTag = cliConfig.searchTag.getOrElse(defaultSearchTag)
     val glitchType = cliConfig.glitch
     val blogUrl = cliConfig.blogUrl.getOrElse(fileConfig.blogUrl)
