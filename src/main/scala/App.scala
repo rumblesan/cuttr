@@ -64,12 +64,13 @@ object App {
     val glitchType = cliConfig.glitch
     val blogUrl = cliConfig.blogUrl.getOrElse(fileConfig.blogUrl)
     val tumblrApi = fileConfig.tumblrApi
+    val blacklist = fileConfig.blacklist
     val caption = cliConfig.imageCaption.getOrElse("")
     (
       (cliConfig.inputFile, cliConfig.inputTumblrPost, cliConfig.randomTumblr) match {
         case (Some(filePath), _, _) => Some(GlitchedPhotoPost(caption, glitchFile(filePath, glitchType)))
         case (None, Some(postId), _) => glitchPost(tumblrApi, postId, glitchType)
-        case (None, None, true) => glitchRandomPost(tumblrApi, searchTag, glitchType)
+        case (None, None, true) => glitchRandomPost(tumblrApi, searchTag, glitchType, blacklist)
         case _ => {
           println("No input specified")
           None
@@ -107,11 +108,12 @@ object App {
     } yield GlitchedPhotoPost(photo.caption, photoData)
   }
 
-  def glitchRandomPost(tumblrApi: TumblrAPI, searchTag: String, glitchType: String): Option[GlitchedPhotoPost] = {
+  def glitchRandomPost(tumblrApi: TumblrAPI, searchTag: String, glitchType: String, blacklist: List[String]): Option[GlitchedPhotoPost] = {
     for {
       tumblrPhotos <- Tumblr.getTaggedPhotos(tumblrApi, searchTag)
       _ = println(s"Retrieved ${tumblrPhotos.length} photos")
-      originalImages = getOriginalImages(tumblrPhotos)
+      unBlacklistedPosts = filterBlacklistedBlogs(tumblrPhotos, blacklist)
+      originalImages = getOriginalImages(unBlacklistedPosts)
       _ = println(s"Found ${originalImages.length} images")
       photo <- Random.shuffle(originalImages).headOption
       _ = println(s"Glitching chosen image: ${photo.imgUrl}")
@@ -153,6 +155,13 @@ object App {
         )
       )
     )
+  }
+
+  def filterBlacklistedBlogs(posts: List[PhotoPost], blacklist: List[String]): List[PhotoPost] = {
+    for {
+      post <- posts
+      if (!blacklist.contains(post.blog_name))
+    } yield post
   }
 
 }

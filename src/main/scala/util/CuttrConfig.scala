@@ -1,12 +1,18 @@
 package com.rumblesan.cuttr.util
 
+import scala.collection.JavaConverters._
+
 import com.typesafe.config.{ Config, ConfigFactory }
 
 import com.rumblesan.util.tumblrapi.TumblrAPI
 
 import scopt.OptionParser
 
-case class CuttrFileConfig(tumblrApi: TumblrAPI, blogUrl: String)
+case class CuttrFileConfig(
+  tumblrApi: TumblrAPI,
+  blogUrl: String,
+  blacklist: List[String]
+)
 
 trait TumblrApiCreation {
 
@@ -34,9 +40,12 @@ trait CuttrFileConfigOps {
 
     val blogUrl = config.getString("cuttr.blog.url")
 
+    val blacklist = config.getStringList("blacklist").asScala.toList
+
     CuttrFileConfig(
       tumblrApi,
-      blogUrl
+      blogUrl,
+      blacklist
     )
 
   }
